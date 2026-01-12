@@ -369,10 +369,26 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
     Ok(())
 }
 
+/// Create a shell command for the current platform.
+/// On Windows uses cmd.exe /C, on Unix uses sh -c.
+fn create_shell_command(cmd_str: &str) -> ProcessCommand {
+    #[cfg(windows)]
+    {
+        let mut cmd = ProcessCommand::new("cmd");
+        cmd.args(["/C", cmd_str]);
+        cmd
+    }
+    #[cfg(not(windows))]
+    {
+        let mut cmd = ProcessCommand::new("sh");
+        cmd.args(["-c", cmd_str]);
+        cmd
+    }
+}
+
 /// Execute a shell command and stream output (used for status checks)
 async fn execute_command(cmd_str: &str) -> anyhow::Result<bool> {
-    let mut cmd = ProcessCommand::new("sh");
-    cmd.args(["-c", cmd_str]);
+    let mut cmd = create_shell_command(cmd_str);
     cmd.stdout(Stdio::piped());
     cmd.stderr(Stdio::piped());
 
@@ -406,8 +422,7 @@ async fn execute_command_with_progress(
     verbose: bool,
     progress: &ProgressBar,
 ) -> anyhow::Result<bool> {
-    let mut cmd = ProcessCommand::new("sh");
-    cmd.args(["-c", cmd_str]);
+    let mut cmd = create_shell_command(cmd_str);
     cmd.stdout(Stdio::piped());
     cmd.stderr(Stdio::piped());
 
