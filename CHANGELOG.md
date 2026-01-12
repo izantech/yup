@@ -37,8 +37,8 @@ Initial release of yup - a safe, cross-platform updater for development tools.
 
 - **Interactive Configuration Wizard** - First-run wizard to select which package managers to update
 - **Cross-Platform Support** - Works on macOS, Linux, and Windows
-- **40+ Package Managers** - Detects and updates tools from various ecosystems
-- **Smart Detection** - Identifies how each tool was installed (Homebrew, asdf, nvm, etc.)
+- **35+ Package Managers** - Detects and updates tools from various ecosystems
+- **Smart Detection** - Identifies how each tool was installed (Homebrew, mise, npm, etc.)
 - **Sudo Support** - Automatically handles privilege elevation for system package managers
 - **Progress Display** - Real-time progress bar during execution
 - **Status Checks** - Check for outdated packages without updating (`--status`)

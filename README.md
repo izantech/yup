@@ -112,7 +112,7 @@ Run `yup config` to reconfigure at any time.
 
 ## Supported Managers
 
-`yup` focuses on package managers that support global package upgrades.
+`yup` focuses on package managers that support global package upgrades. Currently supporting **20** managers across platforms.
 
 ### System Package Managers
 - **brew** - Homebrew (macOS/Linux)
