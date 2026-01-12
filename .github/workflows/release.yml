@@ -327,3 +327,68 @@ jobs:
           download-url: https://github.com/izantech/yup/archive/refs/tags/${{ needs.plan.outputs.tag }}.tar.gz
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  # Submit to Windows Package Manager (winget)
+  publish-winget:
+    needs:
+      - plan
+      - host
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Submit to winget
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: izantech.yup
+          installers-regex: '\.zip$'
+          version: ${{ needs.plan.outputs.tag }}
+          release-tag: ${{ needs.plan.outputs.tag }}
+          token: ${{ secrets.WINGET_TOKEN }}
+
+  # Publish to Chocolatey Community Repository
+  publish-chocolatey:
+    needs:
+      - plan
+      - host
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+      - name: Prepare Chocolatey package
+        shell: pwsh
+        run: |
+          $version = "${{ needs.plan.outputs.tag }}".TrimStart('v')
+          $releaseUrl = "https://github.com/izantech/yup/releases/download/${{ needs.plan.outputs.tag }}"
+
+          # Get checksums from the release
+          $checksumFile = Get-Content "artifacts/yup-${{ needs.plan.outputs.tag }}-checksums.txt" -Raw
+          $checksumX64 = ($checksumFile -split "`n" | Where-Object { $_ -match "x86_64-pc-windows-msvc" } | ForEach-Object { ($_ -split "\s+")[0] })
+          $checksumArm64 = ($checksumFile -split "`n" | Where-Object { $_ -match "aarch64-pc-windows-msvc" } | ForEach-Object { ($_ -split "\s+")[0] })
+
+          # Update nuspec version
+          $nuspec = Get-Content "choco/yup.nuspec" -Raw
+          $nuspec = $nuspec -replace '\{\{VERSION\}\}', $version
+          Set-Content "choco/yup.nuspec" $nuspec
+
+          # Update install script with URLs and checksums
+          $install = Get-Content "choco/tools/chocolateyinstall.ps1" -Raw
+          $install = $install -replace '\{\{URL_X64\}\}', "$releaseUrl/yup-x86_64-pc-windows-msvc.zip"
+          $install = $install -replace '\{\{URL_ARM64\}\}', "$releaseUrl/yup-aarch64-pc-windows-msvc.zip"
+          $install = $install -replace '\{\{CHECKSUM_X64\}\}', $checksumX64
+          $install = $install -replace '\{\{CHECKSUM_ARM64\}\}', $checksumArm64
+          Set-Content "choco/tools/chocolateyinstall.ps1" $install
+
+          # Build the package
+          cd choco
+          choco pack
+      - name: Push to Chocolatey
+        shell: pwsh
+        run: |
+          $version = "${{ needs.plan.outputs.tag }}".TrimStart('v')
+          choco push "choco/yup.$version.nupkg" --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCO_API_KEY }}

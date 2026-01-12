@@ -7,9 +7,9 @@ members = ["cargo:."]
 cargo-dist-version = "0.30.3"
 # CI backends to support
 ci = "github"
-# No installers - distributing via crates.io and Homebrew tap
+# The installers to generate for each app
 installers = []
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
-# Allow custom modifications to the CI workflow
+targets = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "aarch64-pc-windows-msvc", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+# Skip checking whether the specified configuration files are up to date
 allow-dirty = ["ci"]

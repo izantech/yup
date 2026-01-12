@@ -19,6 +19,18 @@ brew tap izantech/tap
 brew install yup
 ```
 
+### winget (Windows)
+
+```powershell
+winget install izantech.yup
+```
+
+### Chocolatey (Windows)
+
+```powershell
+choco install yup
+```
+
 ### From source
 
 ```bash

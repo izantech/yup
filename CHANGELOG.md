@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Windows ARM64 builds (aarch64-pc-windows-msvc)
+- Chocolatey package distribution (`choco install yup`)
+- winget package distribution (`winget install izantech.yup`)
+
 ### Fixed
 
 - Windows path detection for package managers (Chocolatey, Scoop, nvm-windows, fnm)

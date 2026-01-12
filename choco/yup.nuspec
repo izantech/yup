@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>yup</id>
+    <version>{{VERSION}}</version>
+    <title>yup</title>
+    <authors>izantech</authors>
+    <owners>izantech</owners>
+    <projectUrl>https://github.com/izantech/yup</projectUrl>
+    <licenseUrl>https://github.com/izantech/yup/blob/main/LICENSE</licenseUrl>
+    <projectSourceUrl>https://github.com/izantech/yup</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/izantech/yup/issues</bugTrackerUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Safe, cross-platform updater for development tools</summary>
+    <description>yup detects how each tool was installed (Homebrew, asdf, nvm, pyenv, rbenv, conda, etc.) and updates using the correct manager. On first run, it shows an interactive configuration wizard to select which managers to update.</description>
+    <tags>cli update package-manager devtools rust developer-tools updater</tags>
+  </metadata>
+  <files>
+    <file src="tools/**" target="tools" />
+  </files>
+</package>
