@@ -7,52 +7,38 @@ use super::detect::detect_manager;
 use super::managers::create_manager;
 use super::types::{Action, DetectedTool, Manager, ScanReport};
 
-/// List of tools to scan for
-const TOOLS: &[&str] = &[
+/// List of tools to scan for and their expected managers.
+const TOOL_MANAGERS: &[(&str, Manager)] = &[
     // System package managers
-    "brew",
-    "port",
-    "mas",
-    "softwareupdate",
-    // Version managers
-    "asdf",
-    "mise",
-    "pyenv",
-    "rbenv",
-    "rvm",
-    "nvm",
-    "fnm",
-    "volta",
-    "conda",
+    ("brew", Manager::Brew),
+    ("port", Manager::Port),
+    ("mas", Manager::Mas),
+    ("softwareupdate", Manager::SoftwareUpdate),
+    // Version managers (with global upgrade support)
+    ("mise", Manager::Mise),
+    ("conda", Manager::Conda),
     // Node.js ecosystem
-    "node",
-    "npm",
-    "pnpm",
-    "yarn",
-    "bun",
-    // Python ecosystem
-    "python3",
-    "pip3",
-    "pipx",
-    "poetry",
-    "uv",
+    ("npm", Manager::Npm),
+    ("pnpm", Manager::Pnpm),
+    // Python ecosystem (pipx only - pip intentionally excluded)
+    ("pipx", Manager::Pipx),
     // Ruby ecosystem
-    "ruby",
-    "gem",
+    ("gem", Manager::Gem),
     // Rust ecosystem
-    "rustup",
-    "cargo",
-    // Other languages
-    "go",
-    "composer",
+    ("rustup", Manager::Rustup),
+    ("cargo", Manager::Cargo),
+    // Windows package managers
+    ("choco", Manager::Choco),
+    ("winget", Manager::Winget),
+    ("scoop", Manager::Scoop),
 ];
 
 /// Scan the system for installed tools and detect their managers
 pub fn scan() -> ScanReport {
     let mut report = ScanReport::default();
 
-    for &tool_name in TOOLS {
-        if let Some(detected) = detect_tool(tool_name) {
+    for &(tool_name, manager) in TOOL_MANAGERS {
+        if let Some(detected) = detect_tool(tool_name, manager) {
             debug!(
                 tool = tool_name,
                 manager = ?detected.manager,
@@ -77,58 +63,22 @@ pub fn scan() -> ScanReport {
     report
 }
 
-fn detect_tool(name: &str) -> Option<DetectedTool> {
+fn detect_tool(name: &str, manager: Manager) -> Option<DetectedTool> {
     let path = which(name).ok()?;
 
     // Resolve symlinks to get real path
     let resolved = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
 
     // Package manager CLIs map directly to their manager regardless of installation path.
-    // Only runtime binaries (node, python3, ruby) use path-based detection to determine
-    // which version manager controls them.
-    let manager = match name {
-        // System package managers
-        "brew" => Manager::Brew,
-        "port" => Manager::Port,
-        "mas" => Manager::Mas,
-        "softwareupdate" => Manager::SoftwareUpdate,
-        // Version managers
-        "asdf" => Manager::Asdf,
-        "mise" => Manager::Mise,
-        "pyenv" => Manager::Pyenv,
-        "rbenv" => Manager::Rbenv,
-        "rvm" => Manager::Rvm,
-        "nvm" => Manager::Nvm,
-        "fnm" => Manager::Fnm,
-        "volta" => Manager::Volta,
-        "conda" => Manager::Conda,
-        // Node.js package managers
-        "npm" => Manager::Npm,
-        "pnpm" => Manager::Pnpm,
-        "yarn" => Manager::Yarn,
-        "bun" => Manager::Bun,
-        // Python package managers
-        "pip3" => Manager::Pip,
-        "pipx" => Manager::Pipx,
-        "poetry" => Manager::Poetry,
-        "uv" => Manager::Uv,
-        // Ruby package managers
-        "gem" => Manager::Gem,
-        // Rust tools
-        "rustup" => Manager::Rustup,
-        "cargo" => Manager::Cargo,
-        // Other
-        "go" => Manager::Go,
-        "composer" => Manager::Composer,
-        // Runtime binaries - detect based on path to find their version manager
-        // (e.g., node might be from nvm, fnm, volta, asdf, brew, etc.)
-        _ => detect_manager(&resolved),
+    let resolved_manager = if manager == Manager::Unknown {
+        detect_manager(&resolved)
+    } else {
+        manager
     };
 
     Some(DetectedTool {
-        name: name.to_string(),
         path: resolved,
-        manager,
+        manager: resolved_manager,
     })
 }
 

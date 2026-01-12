@@ -2,7 +2,7 @@
 
 Safe, cross-platform updater for development tools.
 
-`yup` detects how each tool was installed (Homebrew, asdf, nvm, pyenv, rbenv, conda, etc.) and updates using the correct manager. On first run, it shows an interactive configuration wizard to select which managers to update. Subsequent runs execute directly with saved preferences.
+`yup` detects your installed package managers and updates them all with a single command. On first run, it shows an interactive configuration wizard to select which managers to update. Subsequent runs execute directly with saved preferences.
 
 ## Installation
 
@@ -112,48 +112,33 @@ Run `yup config` to reconfigure at any time.
 
 ## Supported Managers
 
+`yup` focuses on package managers that support global package upgrades. Currently supporting **20** managers across platforms.
+
 ### System Package Managers
 - **brew** - Homebrew (macOS/Linux)
-- **apt** - Debian/Ubuntu
-- **dnf** - Fedora/RHEL
+- **port** - MacPorts (macOS)
+- **mas** - Mac App Store CLI (macOS)
+- **softwareupdate** - macOS updates
+- **apt** - Debian/Ubuntu (Linux)
+- **dnf** - Fedora/RHEL (Linux)
 - **pacman** - Arch Linux
+- **flatpak** - Flatpak (Linux)
+- **snap** - Snap (Linux)
 - **winget** - Windows Package Manager
 - **choco** - Chocolatey (Windows)
 - **scoop** - Scoop (Windows)
-- **port** - MacPorts
-- **flatpak** - Flatpak (Linux)
-- **snap** - Snap (Linux)
-- **mas** - Mac App Store CLI
-- **softwareupdate** - macOS system updates
 
 ### Version Managers
-- **asdf** - Multiple runtime versions
 - **mise** - Modern polyglot runtime manager (formerly rtx)
-- **pyenv** - Python versions
-- **rbenv** - Ruby versions
-- **rvm** - Ruby Version Manager
-- **nvm** - Node.js versions
-- **fnm** - Fast Node Manager
-- **volta** - JavaScript tool manager
-- **conda/mamba** - Python environments
-- **sdkman** - Java ecosystem
+- **conda/mamba** - Python/data science environments
 
 ### Language Package Managers
-- **npm** - Node.js packages
-- **pnpm** - Fast Node.js package manager
-- **yarn** - Node.js packages
-- **bun** - JavaScript runtime & package manager
-- **pip** - Python packages
-- **pipx** - Python CLI apps
-- **poetry** - Python dependency management
-- **uv** - Fast Python package installer
+- **npm** - Global Node.js packages
+- **pnpm** - Global Node.js packages
+- **pipx** - Python CLI applications (isolated environments)
 - **gem** - Ruby gems
 - **rustup** - Rust toolchains
 - **cargo** - Rust packages (via cargo-update)
-- **go** - Go modules
-- **composer** - PHP packages
-- **helm** - Kubernetes packages
-- **krew** - kubectl plugins
 
 ## Log Files
 
@@ -163,6 +148,11 @@ Logs are stored in platform-appropriate directories:
 - **Windows:** `%APPDATA%/yup/`
 
 Daily rotation with filenames like `yup.2026-01-11.log`.
+
+## Toolchain
+
+This repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
+`cargo build` and `cargo clippy` will use the pinned version automatically.
 
 ## Privilege Handling
 

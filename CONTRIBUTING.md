@@ -30,6 +30,7 @@ For new package managers, include:
 
 - Rust 1.70+ (Edition 2021)
 - Target platform for testing
+- rustup (recommended; honors `rust-toolchain.toml`)
 
 ### Building
 

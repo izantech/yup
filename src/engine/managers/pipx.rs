@@ -1,15 +1,11 @@
 //! pipx package manager
 
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 /// pipx - install and run Python applications in isolated environments
 pub struct PipxManager;
 
 impl PackageManager for PipxManager {
-    fn name(&self) -> &'static str {
-        "pipx"
-    }
-
     fn update_actions(&self) -> Vec<Action> {
         // pipx is typically managed by pip or brew, no self-update command
         vec![]
@@ -17,16 +13,16 @@ impl PackageManager for PipxManager {
 
     fn upgrade_actions(&self) -> Vec<Action> {
         // pipx upgrade-all is safe because each app is in its own isolated venv
-        vec![Action {
-            manager: Manager::Pipx,
-            kind: ActionKind::Upgrade,
-            command: "pipx upgrade-all".to_string(),
-            description: "Upgrade all pipx-installed packages".to_string(),
-            requires_privilege: false,
-        }]
+        vec![Action::new(
+            Manager::Pipx,
+            "pipx upgrade-all",
+            "Upgrade all pipx-installed packages",
+            false,
+        )]
     }
 
-    fn requires_privilege(&self) -> bool {
-        false
+    fn check_actions(&self) -> Vec<Action> {
+        // pipx doesn't provide a read-only "outdated" or dry-run upgrade command.
+        vec![]
     }
 }

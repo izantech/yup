@@ -12,7 +12,7 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
 
     // Get actionable managers sorted (only those with actual update/upgrade actions)
     let mut managers: Vec<Manager> = report.actionable_managers.iter().copied().collect();
-    managers.sort_by_key(|m| format!("{}", m));
+    managers.sort_by_key(|m| m.display_name());
 
     if managers.is_empty() {
         println!("No package managers with available actions detected on this system.");
@@ -23,7 +23,10 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
     println!("Detected {} package managers:\n", managers.len());
 
     // Multi-select for managers
-    let manager_names: Vec<String> = managers.iter().map(|m| format!("{}", m)).collect();
+    let manager_names: Vec<String> = managers
+        .iter()
+        .map(|m| m.display_name().to_string())
+        .collect();
     let defaults: Vec<bool> = vec![true; managers.len()];
 
     let selections = MultiSelect::with_theme(&ColorfulTheme::default())

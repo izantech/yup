@@ -37,60 +37,6 @@ pub fn detect_manager(path: &Path) -> Manager {
 
     // === Environment variable checks (highest priority) ===
 
-    // NVM_DIR for nvm
-    if let Some(nvm_dir) = std::env::var_os("NVM_DIR") {
-        let nvm_path = PathBuf::from(nvm_dir);
-        if path.starts_with(&nvm_path) {
-            return Manager::Nvm;
-        }
-    }
-
-    // VOLTA_HOME for volta
-    if let Some(volta_home) = std::env::var_os("VOLTA_HOME") {
-        let volta_path = PathBuf::from(volta_home);
-        if path.starts_with(&volta_path) {
-            return Manager::Volta;
-        }
-    }
-
-    // ASDF_DATA_DIR for asdf (or default ~/.asdf)
-    if let Some(asdf_dir) = std::env::var_os("ASDF_DATA_DIR") {
-        let asdf_path = PathBuf::from(asdf_dir);
-        if path.starts_with(&asdf_path) {
-            return Manager::Asdf;
-        }
-    }
-
-    // FNM_DIR or FNM_MULTISHELL_PATH for fnm
-    if let Some(fnm_dir) = std::env::var_os("FNM_DIR") {
-        let fnm_path = PathBuf::from(fnm_dir);
-        if path.starts_with(&fnm_path) {
-            return Manager::Fnm;
-        }
-    }
-    if let Some(fnm_multishell) = std::env::var_os("FNM_MULTISHELL_PATH") {
-        let fnm_path = PathBuf::from(fnm_multishell);
-        if path.starts_with(&fnm_path) {
-            return Manager::Fnm;
-        }
-    }
-
-    // PYENV_ROOT for pyenv (or default ~/.pyenv)
-    if let Some(pyenv_root) = std::env::var_os("PYENV_ROOT") {
-        let pyenv_path = PathBuf::from(pyenv_root);
-        if path.starts_with(&pyenv_path) {
-            return Manager::Pyenv;
-        }
-    }
-
-    // RBENV_ROOT for rbenv (or default ~/.rbenv)
-    if let Some(rbenv_root) = std::env::var_os("RBENV_ROOT") {
-        let rbenv_path = PathBuf::from(rbenv_root);
-        if path.starts_with(&rbenv_path) {
-            return Manager::Rbenv;
-        }
-    }
-
     // CONDA_PREFIX for conda/mamba
     if let Some(conda_prefix) = std::env::var_os("CONDA_PREFIX") {
         let conda_path = PathBuf::from(conda_prefix);
@@ -126,43 +72,6 @@ pub fn detect_manager(path: &Path) -> Manager {
     // === Path pattern checks (fallback to default locations) ===
 
     if let Some(home_dir) = home {
-        // Version managers - default locations
-        let nvm_default = home_dir.join(".nvm");
-        if path.starts_with(&nvm_default) {
-            return Manager::Nvm;
-        }
-
-        let fnm_default = home_dir.join(".fnm");
-        let fnm_xdg = home_dir.join(".local/share/fnm");
-        if path.starts_with(&fnm_default) || path.starts_with(&fnm_xdg) {
-            return Manager::Fnm;
-        }
-
-        let volta_default = home_dir.join(".volta");
-        if path.starts_with(&volta_default) {
-            return Manager::Volta;
-        }
-
-        let asdf_default = home_dir.join(".asdf");
-        if path.starts_with(&asdf_default) {
-            return Manager::Asdf;
-        }
-
-        let pyenv_default = home_dir.join(".pyenv");
-        if path.starts_with(&pyenv_default) {
-            return Manager::Pyenv;
-        }
-
-        let rbenv_default = home_dir.join(".rbenv");
-        if path.starts_with(&rbenv_default) {
-            return Manager::Rbenv;
-        }
-
-        let rvm_default = home_dir.join(".rvm");
-        if path.starts_with(&rvm_default) {
-            return Manager::Rvm;
-        }
-
         // Conda/Mamba variants
         let miniconda = home_dir.join("miniconda3");
         let anaconda = home_dir.join("anaconda3");
@@ -199,30 +108,6 @@ pub fn detect_manager(path: &Path) -> Manager {
     // === Windows-specific path patterns ===
     #[cfg(target_os = "windows")]
     {
-        // nvm-windows uses %APPDATA%\nvm
-        if let Some(appdata) = std::env::var_os("APPDATA") {
-            let appdata_path = PathBuf::from(&appdata);
-
-            let nvm_windows = appdata_path.join("nvm");
-            if path.starts_with(&nvm_windows) {
-                return Manager::Nvm;
-            }
-
-            // fnm on Windows may use %APPDATA%\fnm
-            let fnm_appdata = appdata_path.join("fnm");
-            if path.starts_with(&fnm_appdata) {
-                return Manager::Fnm;
-            }
-        }
-
-        // fnm may also use %LOCALAPPDATA%\fnm
-        if let Some(localappdata) = std::env::var_os("LOCALAPPDATA") {
-            let fnm_localappdata = PathBuf::from(localappdata).join("fnm");
-            if path.starts_with(&fnm_localappdata) {
-                return Manager::Fnm;
-            }
-        }
-
         // Chocolatey default path
         let choco_default = Path::new(r"C:\ProgramData\chocolatey");
         if path.starts_with(choco_default) {

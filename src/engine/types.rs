@@ -4,12 +4,11 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-/// Manager enum - each supported package manager/version manager
+/// Manager enum - represents each supported package or version manager.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-#[allow(dead_code)] // Platform-specific variants kept for cross-platform support
 pub enum Manager {
-    // System
+    // System package managers
     Brew,
     Port,
     Apt,
@@ -20,84 +19,134 @@ pub enum Manager {
     Winget,
     Choco,
     Scoop,
-    // Version managers
-    Nvm,
-    Fnm,
-    Volta,
-    Asdf,
-    Mise,
-    Pyenv,
-    Rbenv,
-    Rvm,
-    Conda,
-    // Language tools
-    Npm,
-    Pnpm,
-    Yarn,
-    Bun,
-    Pip,
-    Pipx,
-    Poetry,
-    Uv,
-    Cargo,
-    Rustup,
-    Go,
-    Gem,
-    Composer,
-    Helm,
-    Krew,
-    Sdkman,
-    // Other
     Mas,
     SoftwareUpdate,
+    // Version managers (with global upgrade support)
+    Mise,
+    Conda,
+    // Language tools (with global upgrade support)
+    Npm,
+    Pnpm,
+    Pipx,
+    Cargo,
+    Rustup,
+    Gem,
     // Fallback
     System,
     Unknown,
 }
 
-/// Tool detection result
+/// A tool detected on the system and its associated package manager.
 #[derive(Debug, Clone)]
 pub struct DetectedTool {
-    #[allow(dead_code)] // Useful for future display
-    pub name: String,
+    /// Absolute path to the tool's executable.
     pub path: PathBuf,
+    /// The manager identified as responsible for this tool.
     pub manager: Manager,
 }
 
-/// What can be done
-#[derive(Debug, Clone)]
-#[allow(dead_code)] // Variants kept for future action filtering
-pub enum ActionKind {
-    Update,
-    Upgrade,
-    Cleanup,
-    Check,
-}
-
-/// A single action to perform
+/// A single discrete action to be performed by a package manager.
 #[derive(Debug, Clone)]
 pub struct Action {
+    /// The manager that will execute this action.
     pub manager: Manager,
-    #[allow(dead_code)] // Useful for future action filtering by type
-    pub kind: ActionKind,
+    /// The shell command to execute.
     pub command: String,
+    /// Human-readable description of what this action does.
     pub description: String,
-    /// Whether this action requires root/admin privileges (sudo on Unix)
+    /// Whether this action requires root/admin privileges (sudo on Unix).
     pub requires_privilege: bool,
 }
 
-/// Result of scanning the system
+/// Comprehensive report of the system scan results.
 #[derive(Debug, Default)]
 pub struct ScanReport {
+    /// List of all detected tools.
     pub detected_tools: Vec<DetectedTool>,
+    /// Set of managers that were found to be available.
     pub available_managers: HashSet<Manager>,
-    /// Managers that have PackageManager implementations AND return actions
+    /// Subset of available managers that have actionable implementations.
     pub actionable_managers: HashSet<Manager>,
 }
 
 impl std::fmt::Display for Manager {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{}", self.display_name())
+    }
+}
+
+impl Manager {
+    /// Canonical lowercase name for CLI filtering and config.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Manager::Brew => "brew",
+            Manager::Port => "port",
+            Manager::Apt => "apt",
+            Manager::Dnf => "dnf",
+            Manager::Pacman => "pacman",
+            Manager::Flatpak => "flatpak",
+            Manager::Snap => "snap",
+            Manager::Winget => "winget",
+            Manager::Choco => "choco",
+            Manager::Scoop => "scoop",
+            Manager::Mas => "mas",
+            Manager::SoftwareUpdate => "softwareupdate",
+            Manager::Mise => "mise",
+            Manager::Conda => "conda",
+            Manager::Npm => "npm",
+            Manager::Pnpm => "pnpm",
+            Manager::Pipx => "pipx",
+            Manager::Cargo => "cargo",
+            Manager::Rustup => "rustup",
+            Manager::Gem => "gem",
+            Manager::System => "system",
+            Manager::Unknown => "unknown",
+        }
+    }
+
+    /// Human-readable name for display.
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            Manager::Brew => "Brew",
+            Manager::Port => "Port",
+            Manager::Apt => "Apt",
+            Manager::Dnf => "Dnf",
+            Manager::Pacman => "Pacman",
+            Manager::Flatpak => "Flatpak",
+            Manager::Snap => "Snap",
+            Manager::Winget => "Winget",
+            Manager::Choco => "Choco",
+            Manager::Scoop => "Scoop",
+            Manager::Mas => "Mas",
+            Manager::SoftwareUpdate => "SoftwareUpdate",
+            Manager::Mise => "Mise",
+            Manager::Conda => "Conda",
+            Manager::Npm => "Npm",
+            Manager::Pnpm => "Pnpm",
+            Manager::Pipx => "Pipx",
+            Manager::Cargo => "Cargo",
+            Manager::Rustup => "Rustup",
+            Manager::Gem => "Gem",
+            Manager::System => "System",
+            Manager::Unknown => "Unknown",
+        }
+    }
+}
+
+impl Action {
+    /// Create a new action
+    pub fn new(
+        manager: Manager,
+        command: impl Into<String>,
+        description: impl Into<String>,
+        requires_privilege: bool,
+    ) -> Self {
+        Self {
+            manager,
+            command: command.into(),
+            description: description.into(),
+            requires_privilege,
+        }
     }
 }
 
@@ -106,6 +155,7 @@ impl FromStr for Manager {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
+            // System package managers
             "brew" => Ok(Manager::Brew),
             "port" => Ok(Manager::Port),
             "apt" => Ok(Manager::Apt),
@@ -116,33 +166,19 @@ impl FromStr for Manager {
             "winget" => Ok(Manager::Winget),
             "choco" => Ok(Manager::Choco),
             "scoop" => Ok(Manager::Scoop),
-            "nvm" => Ok(Manager::Nvm),
-            "fnm" => Ok(Manager::Fnm),
-            "volta" => Ok(Manager::Volta),
-            "asdf" => Ok(Manager::Asdf),
-            "mise" => Ok(Manager::Mise),
-            "pyenv" => Ok(Manager::Pyenv),
-            "rbenv" => Ok(Manager::Rbenv),
-            "rvm" => Ok(Manager::Rvm),
-            "conda" => Ok(Manager::Conda),
-            "npm" => Ok(Manager::Npm),
-            "pnpm" => Ok(Manager::Pnpm),
-            "yarn" => Ok(Manager::Yarn),
-            "bun" => Ok(Manager::Bun),
-            "pip" => Ok(Manager::Pip),
-            "pipx" => Ok(Manager::Pipx),
-            "poetry" => Ok(Manager::Poetry),
-            "uv" => Ok(Manager::Uv),
-            "cargo" => Ok(Manager::Cargo),
-            "rustup" => Ok(Manager::Rustup),
-            "go" => Ok(Manager::Go),
-            "gem" => Ok(Manager::Gem),
-            "composer" => Ok(Manager::Composer),
-            "helm" => Ok(Manager::Helm),
-            "krew" => Ok(Manager::Krew),
-            "sdkman" => Ok(Manager::Sdkman),
             "mas" => Ok(Manager::Mas),
             "softwareupdate" => Ok(Manager::SoftwareUpdate),
+            // Version managers
+            "mise" => Ok(Manager::Mise),
+            "conda" => Ok(Manager::Conda),
+            // Language tools
+            "npm" => Ok(Manager::Npm),
+            "pnpm" => Ok(Manager::Pnpm),
+            "pipx" => Ok(Manager::Pipx),
+            "cargo" => Ok(Manager::Cargo),
+            "rustup" => Ok(Manager::Rustup),
+            "gem" => Ok(Manager::Gem),
+            // Fallback
             "system" => Ok(Manager::System),
             "unknown" => Ok(Manager::Unknown),
             _ => Err(format!("Unknown manager: {}", s)),

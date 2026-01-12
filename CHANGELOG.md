@@ -12,10 +12,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows ARM64 builds (aarch64-pc-windows-msvc)
 - Chocolatey package distribution (`choco install yup`)
 - winget package distribution (`winget install izantech.yup`)
+- Windows shell command support for cross-platform execution
+- `check_actions` for showing outdated packages via `--status` flag
+
+### Changed
+
+- Removed 17 package managers that lack meaningful global upgrade support:
+  - **Project-local managers**: yarn, poetry, bun, uv, pip, go
+  - **Version managers without bulk upgrade**: fnm, nvm, asdf, pyenv, rbenv, volta, rvm, sdkman
+  - **Niche managers**: helm, krew, composer
+- Simplified path detection logic for removed version managers
+- Updated documentation to reflect focused manager support (20 managers)
 
 ### Fixed
 
-- Windows path detection for package managers (Chocolatey, Scoop, nvm-windows, fnm)
+- Windows path detection for package managers (Chocolatey, Scoop)
 - Wrapped Unix-specific paths with conditional compilation to prevent dead code on Windows
 
 ## [0.1.0] - 2026-01-12
@@ -26,8 +37,8 @@ Initial release of yup - a safe, cross-platform updater for development tools.
 
 - **Interactive Configuration Wizard** - First-run wizard to select which package managers to update
 - **Cross-Platform Support** - Works on macOS, Linux, and Windows
-- **40+ Package Managers** - Detects and updates tools from various ecosystems
-- **Smart Detection** - Identifies how each tool was installed (Homebrew, asdf, nvm, etc.)
+- **20 Package Managers** - Detects and updates tools from various ecosystems
+- **Smart Detection** - Identifies how each tool was installed (Homebrew, mise, npm, etc.)
 - **Sudo Support** - Automatically handles privilege elevation for system package managers
 - **Progress Display** - Real-time progress bar during execution
 - **Status Checks** - Check for outdated packages without updating (`--status`)
@@ -65,25 +76,14 @@ Initial release of yup - a safe, cross-platform updater for development tools.
 - softwareupdate (macOS)
 
 **Version Managers:**
-- asdf
 - mise (formerly rtx)
-- pyenv
-- rbenv
-- rvm
-- nvm
-- fnm
-- volta
-- conda
-- sdkman
 
 **Language Package Managers:**
-- npm, pnpm, yarn, bun (JavaScript)
-- pip, pipx, poetry, uv (Python)
+- npm, pnpm (JavaScript)
+- pipx (Python)
 - gem (Ruby)
 - rustup, cargo (Rust)
-- go (Go)
-- composer (PHP)
-- helm, krew (Kubernetes)
+- conda (Python)
 
 ### Privilege Handling
 

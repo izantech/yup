@@ -1,31 +1,39 @@
 //! Pacman package manager (Arch Linux)
 
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{command_exists, Action, Manager, PackageManager};
 
 /// Pacman package manager
 pub struct PacmanManager;
 
-impl PackageManager for PacmanManager {
-    fn name(&self) -> &'static str {
-        "Pacman"
-    }
+fn checkupdates_available() -> bool {
+    command_exists("checkupdates")
+}
 
+impl PackageManager for PacmanManager {
     fn update_actions(&self) -> Vec<Action> {
         // pacman -Syu combines update+upgrade, no separate update needed
         vec![]
     }
 
     fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Pacman,
-            kind: ActionKind::Upgrade,
-            command: "pacman -Syu --noconfirm".to_string(),
-            description: "Sync and upgrade all packages".to_string(),
-            requires_privilege: true,
-        }]
+        vec![Action::new(
+            Manager::Pacman,
+            "pacman -Syu --noconfirm",
+            "Sync and upgrade all packages",
+            true,
+        )]
     }
 
-    fn requires_privilege(&self) -> bool {
-        true
+    fn check_actions(&self) -> Vec<Action> {
+        if checkupdates_available() {
+            vec![Action::new(
+                Manager::Pacman,
+                "checkupdates",
+                "Check for available updates",
+                false,
+            )]
+        } else {
+            vec![]
+        }
     }
 }

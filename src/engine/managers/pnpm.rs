@@ -1,46 +1,35 @@
 //! pnpm package manager
 
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 /// pnpm package manager
 pub struct PnpmManager;
 
 impl PackageManager for PnpmManager {
-    fn name(&self) -> &'static str {
-        "pnpm"
-    }
-
     fn update_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Pnpm,
-            kind: ActionKind::Update,
-            command: "pnpm self-update".to_string(),
-            description: "Update pnpm itself".to_string(),
-            requires_privilege: false,
-        }]
+        vec![Action::new(
+            Manager::Pnpm,
+            "pnpm self-update",
+            "Update pnpm itself",
+            false,
+        )]
     }
 
     fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Pnpm,
-            kind: ActionKind::Upgrade,
-            command: "pnpm update -g".to_string(),
-            description: "Update global pnpm packages".to_string(),
-            requires_privilege: false,
-        }]
+        vec![Action::new(
+            Manager::Pnpm,
+            "pnpm update -g",
+            "Update global pnpm packages",
+            false,
+        )]
     }
 
     fn check_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Pnpm,
-            kind: ActionKind::Check,
-            command: "pnpm outdated -g".to_string(),
-            description: "Check for outdated global pnpm packages".to_string(),
-            requires_privilege: false,
-        }]
-    }
-
-    fn requires_privilege(&self) -> bool {
-        false
+        vec![Action::new(
+            Manager::Pnpm,
+            "pnpm outdated -g",
+            "Check for outdated global pnpm packages",
+            false,
+        )]
     }
 }

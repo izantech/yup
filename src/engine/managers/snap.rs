@@ -1,31 +1,31 @@
 //! Snap package manager
 
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 /// Snap package manager
 pub struct SnapManager;
 
 impl PackageManager for SnapManager {
-    fn name(&self) -> &'static str {
-        "Snap"
-    }
-
     fn update_actions(&self) -> Vec<Action> {
         // snap refresh does both update and upgrade
         vec![]
     }
 
     fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Snap,
-            kind: ActionKind::Upgrade,
-            command: "snap refresh".to_string(),
-            description: "Refresh all Snap packages".to_string(),
-            requires_privilege: true,
-        }]
+        vec![Action::new(
+            Manager::Snap,
+            "snap refresh",
+            "Refresh all Snap packages",
+            true,
+        )]
     }
 
-    fn requires_privilege(&self) -> bool {
-        true // snap refresh needs sudo
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action::new(
+            Manager::Snap,
+            "snap refresh --list",
+            "Check for available updates",
+            false,
+        )]
     }
 }

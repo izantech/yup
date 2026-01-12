@@ -9,26 +9,25 @@ pub fn filter_actions(
     only: Option<&[String]>,
     skip: Option<&[String]>,
 ) -> Vec<Action> {
+    let only_list = only.map(|items| items.iter().map(|o| o.to_lowercase()).collect::<Vec<_>>());
+    let skip_list = skip.map(|items| items.iter().map(|s| s.to_lowercase()).collect::<Vec<_>>());
+
     actions
         .into_iter()
         .filter(|action| {
-            let manager_name = format!("{:?}", action.manager).to_lowercase();
+            let manager_name = action.manager.as_str();
 
             // Filter by --only (whitelist)
-            if let Some(only_list) = only {
-                let matches = only_list
-                    .iter()
-                    .any(|o| manager_name.contains(&o.to_lowercase()));
+            if let Some(ref only_list) = only_list {
+                let matches = only_list.iter().any(|o| manager_name.contains(o));
                 if !matches {
                     return false;
                 }
             }
 
             // Filter by --skip (blacklist)
-            if let Some(skip_list) = skip {
-                let matches = skip_list
-                    .iter()
-                    .any(|s| manager_name.contains(&s.to_lowercase()));
+            if let Some(ref skip_list) = skip_list {
+                let matches = skip_list.iter().any(|s| manager_name.contains(s));
                 if matches {
                     return false;
                 }
@@ -42,16 +41,15 @@ pub fn filter_actions(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::engine::types::{ActionKind, Manager};
+    use crate::engine::types::Manager;
 
     fn make_action(manager: Manager) -> Action {
-        Action {
+        Action::new(
             manager,
-            kind: ActionKind::Update,
-            command: format!("{:?} update", manager),
-            description: format!("Update {:?}", manager),
-            requires_privilege: false,
-        }
+            format!("{:?} update", manager),
+            format!("Update {:?}", manager),
+            false,
+        )
     }
 
     #[test]
@@ -75,10 +73,10 @@ mod tests {
         let actions = vec![
             make_action(Manager::Brew),
             make_action(Manager::Npm),
-            make_action(Manager::Pip),
+            make_action(Manager::Pipx),
         ];
 
-        let skip = vec!["npm".to_string(), "pip".to_string()];
+        let skip = vec!["npm".to_string(), "pipx".to_string()];
         let filtered = filter_actions(actions, None, Some(&skip));
 
         assert_eq!(filtered.len(), 1);
