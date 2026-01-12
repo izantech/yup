@@ -329,12 +329,15 @@ jobs:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 
   # Submit to Windows Package Manager (winget)
+  # NOTE: First version must be submitted manually at https://github.com/microsoft/winget-pkgs
+  # This action only updates existing packages
   publish-winget:
     needs:
       - plan
       - host
     if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' }}
     runs-on: windows-latest
+    continue-on-error: true  # Don't fail the whole release if winget fails
     steps:
       - name: Submit to winget
         uses: vedantmgoyal9/winget-releaser@v2
@@ -352,24 +355,26 @@ jobs:
       - host
     if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' }}
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - name: Download release artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: artifacts-*
-          path: artifacts
-          merge-multiple: true
       - name: Prepare Chocolatey package
         shell: pwsh
         run: |
           $version = "${{ needs.plan.outputs.tag }}".TrimStart('v')
           $releaseUrl = "https://github.com/izantech/yup/releases/download/${{ needs.plan.outputs.tag }}"
 
-          # Get checksums from the release
-          $checksumFile = Get-Content "artifacts/yup-${{ needs.plan.outputs.tag }}-checksums.txt" -Raw
-          $checksumX64 = ($checksumFile -split "`n" | Where-Object { $_ -match "x86_64-pc-windows-msvc" } | ForEach-Object { ($_ -split "\s+")[0] })
-          $checksumArm64 = ($checksumFile -split "`n" | Where-Object { $_ -match "aarch64-pc-windows-msvc" } | ForEach-Object { ($_ -split "\s+")[0] })
+          # Download checksums from GitHub release
+          gh release download "${{ needs.plan.outputs.tag }}" --pattern "sha256.sum" --output sha256.sum
+          $checksumFile = Get-Content "sha256.sum" -Raw
+
+          # Parse checksums (format: "hash *filename")
+          $checksumX64 = ($checksumFile -split "`n" | Where-Object { $_ -match "x86_64-pc-windows-msvc\.zip" } | ForEach-Object { ($_ -split " ")[0] })
+          $checksumArm64 = ($checksumFile -split "`n" | Where-Object { $_ -match "aarch64-pc-windows-msvc\.zip" } | ForEach-Object { ($_ -split " ")[0] })
+
+          Write-Host "x64 checksum: $checksumX64"
+          Write-Host "ARM64 checksum: $checksumArm64"
 
           # Update nuspec version
           $nuspec = Get-Content "choco/yup.nuspec" -Raw
