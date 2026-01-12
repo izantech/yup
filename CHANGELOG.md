@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **CRITICAL**: Configuration wizard showing "No package managers with available actions detected" for first-time users
+  - Bug introduced in v0.1.3 refactor where `actionable_managers` was left empty
+  - First-time users (without saved config) could not use the tool at all
+  - Existing users with saved configs were not affected
+
+### Added
+
+- Comprehensive test suite for scan module (7 new tests)
+  - Regression tests to prevent `actionable_managers` bug from recurring
+  - Validation of manager detection, implementation, and action availability
+  - Consistency and determinism tests for scan results
+
 ## [0.1.3] - 2026-01-12
 
 ### Added
