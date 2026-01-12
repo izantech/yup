@@ -20,6 +20,11 @@ src/
         └── *.rs      # Individual manager implementations
 ```
 
+## Toolchain
+
+The repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
+`cargo build` and `cargo clippy` will use the pinned version automatically.
+
 ## Architecture Overview
 
 ### Core Flow
@@ -47,9 +52,11 @@ struct ScanReport { detected_tools, available_managers, actionable_managers }
 pub trait PackageManager {
     fn update_actions(&self) -> Vec<Action>;      // Update package index
     fn upgrade_actions(&self) -> Vec<Action>;     // Upgrade packages
-    fn check_actions(&self) -> Vec<Action>;       // Check for outdated (optional)
+    fn check_actions(&self) -> Vec<Action>;       // Check for outdated (optional; default impl)
 }
 ```
+
+Note: `check_actions()` has a default implementation; managers can override it.
 
 ## Adding a New Package Manager
 

@@ -15,7 +15,7 @@ impl PackageManager for NpmManager {
         vec![Action::new(
             Manager::Npm,
             "npm update -g",
-            "Update global npm packages",
+            "Update global npm packages (within semver ranges)",
             false,
         )]
     }

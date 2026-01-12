@@ -118,7 +118,7 @@ Run `yup config` to reconfigure at any time.
 - **brew** - Homebrew (macOS/Linux)
 - **port** - MacPorts (macOS)
 - **mas** - Mac App Store CLI (macOS)
-- **softwareupdate** - macOS system updates
+- **softwareupdate** - macOS updates
 - **apt** - Debian/Ubuntu (Linux)
 - **dnf** - Fedora/RHEL (Linux)
 - **pacman** - Arch Linux
@@ -148,6 +148,11 @@ Logs are stored in platform-appropriate directories:
 - **Windows:** `%APPDATA%/yup/`
 
 Daily rotation with filenames like `yup.2026-01-11.log`.
+
+## Toolchain
+
+This repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
+`cargo build` and `cargo clippy` will use the pinned version automatically.
 
 ## Privilege Handling
 

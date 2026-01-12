@@ -387,34 +387,35 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
     cmd.stderr(Stdio::piped());
 
     let mut child = cmd.spawn()?;
-    let mut stderr_output = Vec::new();
+    let (progress, verbose, stream) = match mode {
+        OutputMode::Stream => (None, false, true),
+        OutputMode::Progress { progress, verbose } => (Some(progress), verbose, false),
+    };
 
-    // Handle stdout
-    if let Some(stdout) = child.stdout.take() {
-        let mut reader = BufReader::new(stdout).lines();
-        while let Some(line) = reader.next_line().await? {
-            match mode {
-                OutputMode::Stream => {
+    let stdout_future = async {
+        if let Some(stdout) = child.stdout.take() {
+            let mut reader = BufReader::new(stdout).lines();
+            while let Some(line) = reader.next_line().await? {
+                if stream {
                     println!("      {}", line);
-                }
-                OutputMode::Progress { progress, verbose } => {
+                } else if let Some(progress) = progress {
                     if verbose {
                         progress.suspend(|| println!("      {}", line));
                     }
                 }
             }
         }
-    }
+        Ok::<(), anyhow::Error>(())
+    };
 
-    // Handle stderr - always capture, only display if verbose or on error
-    if let Some(stderr) = child.stderr.take() {
-        let mut reader = BufReader::new(stderr).lines();
-        while let Some(line) = reader.next_line().await? {
-            match mode {
-                OutputMode::Stream => {
+    let stderr_future = async {
+        let mut stderr_output = Vec::new();
+        if let Some(stderr) = child.stderr.take() {
+            let mut reader = BufReader::new(stderr).lines();
+            while let Some(line) = reader.next_line().await? {
+                if stream {
                     println!("      [err] {}", line);
-                }
-                OutputMode::Progress { progress, verbose } => {
+                } else if let Some(progress) = progress {
                     stderr_output.push(line.clone());
                     if verbose {
                         progress.suspend(|| println!("      [err] {}", line));
@@ -422,7 +423,12 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
                 }
             }
         }
-    }
+        Ok::<Vec<String>, anyhow::Error>(stderr_output)
+    };
+
+    let (stdout_result, stderr_result) = tokio::join!(stdout_future, stderr_future);
+    stdout_result?;
+    let stderr_output = stderr_result?;
 
     let status = child.wait().await?;
 

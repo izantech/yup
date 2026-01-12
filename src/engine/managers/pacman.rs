@@ -1,9 +1,13 @@
 //! Pacman package manager (Arch Linux)
 
-use super::{Action, Manager, PackageManager};
+use super::{command_exists, Action, Manager, PackageManager};
 
 /// Pacman package manager
 pub struct PacmanManager;
+
+fn checkupdates_available() -> bool {
+    command_exists("checkupdates")
+}
 
 impl PackageManager for PacmanManager {
     fn update_actions(&self) -> Vec<Action> {
@@ -21,11 +25,15 @@ impl PackageManager for PacmanManager {
     }
 
     fn check_actions(&self) -> Vec<Action> {
-        vec![Action::new(
-            Manager::Pacman,
-            "checkupdates",
-            "Check for available updates",
-            false,
-        )]
+        if checkupdates_available() {
+            vec![Action::new(
+                Manager::Pacman,
+                "checkupdates",
+                "Check for available updates",
+                false,
+            )]
+        } else {
+            vec![]
+        }
     }
 }
