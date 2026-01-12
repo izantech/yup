@@ -75,6 +75,51 @@ cargo clippy
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for a step-by-step guide.
 
+## Releasing
+
+We use [cargo-release](https://github.com/crate-ci/cargo-release) to automate version bumping, tagging, and pushing.
+
+### Setup (one-time)
+
+```bash
+cargo install cargo-release
+```
+
+### Creating a Release
+
+```bash
+# Patch release (0.1.0 → 0.1.1)
+cargo release patch --execute
+
+# Minor release (0.1.1 → 0.2.0)
+cargo release minor --execute
+
+# Major release (0.2.0 → 1.0.0)
+cargo release major --execute
+```
+
+This will:
+1. Bump the version in `Cargo.toml`
+2. Commit the change
+3. Create a git tag (e.g., `v0.1.1`)
+4. Push the commit and tag to GitHub
+
+The GitHub Actions workflow then automatically:
+- Builds binaries for all platforms (macOS, Linux, Windows x64/ARM64)
+- Creates a GitHub Release
+- Publishes to crates.io
+- Updates the Homebrew formula
+- Submits to winget (Windows Package Manager)
+- Publishes to Chocolatey
+
+### Preview (dry-run)
+
+To see what would happen without making changes:
+
+```bash
+cargo release patch
+```
+
 ## License
 
 MIT. Your contributions will be licensed under the same terms.
