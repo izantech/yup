@@ -8,6 +8,19 @@ This document describes the commands executed by `yup` for each supported packag
 - **Upgrade** - Install newer versions of packages (e.g., `brew upgrade`)
 - **Check** - List outdated packages without making changes (used by `--status`)
 
+## Privilege Requirements
+
+Some managers require root privileges. On Unix systems, `yup` automatically prepends `sudo` to these commands:
+
+| Manager | Requires sudo |
+|---------|---------------|
+| apt, dnf, pacman, snap | Yes (Linux) |
+| port, mas, softwareupdate | Yes (macOS) |
+| choco | Yes (Windows - admin) |
+| All others | No |
+
+When privileged commands are queued, `yup` prompts for your password once via `sudo -v` before execution.
+
 ## Supported Package Managers
 
 ### System Package Managers

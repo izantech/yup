@@ -16,6 +16,7 @@ impl PackageManager for PoetryManager {
             kind: ActionKind::Update,
             command: "poetry self update".to_string(),
             description: "Update Poetry itself".to_string(),
+            requires_privilege: false,
         }]
     }
 

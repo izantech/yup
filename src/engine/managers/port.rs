@@ -16,6 +16,7 @@ impl PackageManager for PortManager {
             kind: ActionKind::Update,
             command: "port selfupdate".to_string(),
             description: "Update MacPorts and port definitions".to_string(),
+            requires_privilege: true,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for PortManager {
             kind: ActionKind::Upgrade,
             command: "port upgrade outdated".to_string(),
             description: "Upgrade outdated ports".to_string(),
+            requires_privilege: true,
         }]
     }
 

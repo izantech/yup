@@ -21,6 +21,7 @@ impl PackageManager for MasManager {
             kind: ActionKind::Upgrade,
             command: "mas upgrade".to_string(),
             description: "Upgrade Mac App Store apps".to_string(),
+            requires_privilege: true,
         }]
     }
 
@@ -30,6 +31,7 @@ impl PackageManager for MasManager {
             kind: ActionKind::Check,
             command: "mas outdated".to_string(),
             description: "Check for outdated Mac App Store apps".to_string(),
+            requires_privilege: false,
         }]
     }
 

@@ -16,6 +16,7 @@ impl PackageManager for GemManager {
             kind: ActionKind::Update,
             command: "gem update --system".to_string(),
             description: "Update RubyGems itself".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for GemManager {
             kind: ActionKind::Upgrade,
             command: "gem update".to_string(),
             description: "Update all installed gems".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -34,6 +36,7 @@ impl PackageManager for GemManager {
             kind: ActionKind::Check,
             command: "gem outdated".to_string(),
             description: "Check for outdated Ruby gems".to_string(),
+            requires_privilege: false,
         }]
     }
 

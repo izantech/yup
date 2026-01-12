@@ -16,6 +16,7 @@ impl PackageManager for ScoopManager {
             kind: ActionKind::Update,
             command: "scoop update".to_string(),
             description: "Update Scoop and manifests".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for ScoopManager {
             kind: ActionKind::Upgrade,
             command: "scoop update *".to_string(),
             description: "Update all packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

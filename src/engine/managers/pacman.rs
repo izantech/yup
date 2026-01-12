@@ -21,6 +21,7 @@ impl PackageManager for PacmanManager {
             kind: ActionKind::Upgrade,
             command: "pacman -Syu --noconfirm".to_string(),
             description: "Sync and upgrade all packages".to_string(),
+            requires_privilege: true,
         }]
     }
 

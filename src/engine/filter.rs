@@ -50,6 +50,7 @@ mod tests {
             kind: ActionKind::Update,
             command: format!("{:?} update", manager),
             description: format!("Update {:?}", manager),
+            requires_privilege: false,
         }
     }
 

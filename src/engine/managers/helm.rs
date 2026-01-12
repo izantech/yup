@@ -16,6 +16,7 @@ impl PackageManager for HelmManager {
             kind: ActionKind::Update,
             command: "helm repo update".to_string(),
             description: "Update Helm repository metadata".to_string(),
+            requires_privilege: false,
         }]
     }
 

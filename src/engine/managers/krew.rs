@@ -16,6 +16,7 @@ impl PackageManager for KrewManager {
             kind: ActionKind::Update,
             command: "kubectl krew update".to_string(),
             description: "Update krew plugin index".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for KrewManager {
             kind: ActionKind::Upgrade,
             command: "kubectl krew upgrade".to_string(),
             description: "Upgrade all kubectl plugins".to_string(),
+            requires_privilege: false,
         }]
     }
 

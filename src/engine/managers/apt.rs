@@ -16,6 +16,7 @@ impl PackageManager for AptManager {
             kind: ActionKind::Update,
             command: "apt update".to_string(),
             description: "Update package lists".to_string(),
+            requires_privilege: true,
         }]
     }
 
@@ -26,12 +27,14 @@ impl PackageManager for AptManager {
                 kind: ActionKind::Upgrade,
                 command: "apt upgrade -y".to_string(),
                 description: "Upgrade all packages".to_string(),
+                requires_privilege: true,
             },
             Action {
                 manager: Manager::Apt,
                 kind: ActionKind::Cleanup,
                 command: "apt autoremove -y".to_string(),
                 description: "Remove unused dependencies".to_string(),
+                requires_privilege: true,
             },
         ]
     }

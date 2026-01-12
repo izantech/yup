@@ -22,6 +22,7 @@ impl PackageManager for WingetManager {
             command: "winget upgrade --all --accept-package-agreements --accept-source-agreements"
                 .to_string(),
             description: "Upgrade all packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

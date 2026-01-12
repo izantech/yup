@@ -21,6 +21,7 @@ impl PackageManager for NpmManager {
             kind: ActionKind::Upgrade,
             command: "npm update -g".to_string(),
             description: "Update global npm packages".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -30,6 +31,7 @@ impl PackageManager for NpmManager {
             kind: ActionKind::Check,
             command: "npm outdated -g".to_string(),
             description: "Check for outdated global npm packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

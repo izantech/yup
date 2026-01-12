@@ -16,6 +16,7 @@ impl PackageManager for YarnManager {
             kind: ActionKind::Update,
             command: "yarn set version stable".to_string(),
             description: "Update Yarn to stable version".to_string(),
+            requires_privilege: false,
         }]
     }
 

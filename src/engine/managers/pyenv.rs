@@ -20,6 +20,7 @@ impl PackageManager for PyenvManager {
                 kind: ActionKind::Update,
                 command: "pyenv update".to_string(),
                 description: "Update pyenv and plugins".to_string(),
+                requires_privilege: false,
             }]
         } else {
             vec![] // No pyenv-update plugin, can't self-update

@@ -22,12 +22,14 @@ impl PackageManager for DnfManager {
                 kind: ActionKind::Upgrade,
                 command: "dnf upgrade -y".to_string(),
                 description: "Upgrade all packages".to_string(),
+                requires_privilege: true,
             },
             Action {
                 manager: Manager::Dnf,
                 kind: ActionKind::Cleanup,
                 command: "dnf autoremove -y".to_string(),
                 description: "Remove unused dependencies".to_string(),
+                requires_privilege: true,
             },
         ]
     }

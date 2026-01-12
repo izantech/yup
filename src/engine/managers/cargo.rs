@@ -28,6 +28,7 @@ impl PackageManager for CargoManager {
                 kind: ActionKind::Upgrade,
                 command: "cargo install-update -a".to_string(),
                 description: "Update all cargo-installed binaries".to_string(),
+                requires_privilege: false,
             }]
         } else {
             vec![]
@@ -41,6 +42,7 @@ impl PackageManager for CargoManager {
                 kind: ActionKind::Check,
                 command: "cargo install-update -l".to_string(),
                 description: "List outdated cargo-installed binaries".to_string(),
+                requires_privilege: false,
             }]
         } else {
             vec![]

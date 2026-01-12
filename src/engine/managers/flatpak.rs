@@ -21,6 +21,7 @@ impl PackageManager for FlatpakManager {
             kind: ActionKind::Upgrade,
             command: "flatpak update -y".to_string(),
             description: "Update all Flatpak applications".to_string(),
+            requires_privilege: false,
         }]
     }
 

@@ -17,6 +17,7 @@ impl PackageManager for PipManager {
             kind: ActionKind::Update,
             command: "pip install --upgrade pip".to_string(),
             description: "Upgrade pip itself".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -32,6 +33,7 @@ impl PackageManager for PipManager {
             kind: ActionKind::Check,
             command: "pip list --outdated".to_string(),
             description: "Check for outdated pip packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

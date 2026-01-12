@@ -18,6 +18,7 @@ impl PackageManager for RvmManager {
             command: r#"bash -c 'source "${rvm_path:-$HOME/.rvm}/scripts/rvm" && rvm get stable'"#
                 .to_string(),
             description: "Update RVM to stable".to_string(),
+            requires_privilege: false,
         }]
     }
 

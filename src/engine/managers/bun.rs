@@ -16,6 +16,7 @@ impl PackageManager for BunManager {
             kind: ActionKind::Update,
             command: "bun upgrade".to_string(),
             description: "Upgrade Bun to latest version".to_string(),
+            requires_privilege: false,
         }]
     }
 

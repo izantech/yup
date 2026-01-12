@@ -16,6 +16,7 @@ impl PackageManager for AsdfManager {
             kind: ActionKind::Update,
             command: "asdf plugin update --all".to_string(),
             description: "Update all asdf plugins".to_string(),
+            requires_privilege: false,
         }]
     }
 

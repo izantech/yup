@@ -21,6 +21,7 @@ impl PackageManager for ChocoManager {
             kind: ActionKind::Upgrade,
             command: "choco upgrade all -y".to_string(),
             description: "Upgrade all packages".to_string(),
+            requires_privilege: true,
         }]
     }
 

@@ -16,6 +16,7 @@ impl PackageManager for UvManager {
             kind: ActionKind::Update,
             command: "uv self update".to_string(),
             description: "Update uv itself".to_string(),
+            requires_privilege: false,
         }]
     }
 

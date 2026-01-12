@@ -20,12 +20,14 @@ impl PackageManager for SdkmanManager {
                 command: r#"bash -c 'source "${SDKMAN_DIR:-$HOME/.sdkman}/bin/sdkman-init.sh" && sdk selfupdate'"#
                     .to_string(),
                 description: "Update SDKMAN itself".to_string(),
+                requires_privilege: false,
             },
             Action {
                 manager: Manager::Sdkman,
                 kind: ActionKind::Update,
                 command: r#"bash -c 'source "${SDKMAN_DIR:-$HOME/.sdkman}/bin/sdkman-init.sh" && sdk update'"#.to_string(),
                 description: "Update SDKMAN candidate list".to_string(),
+                requires_privilege: false,
             },
         ]
     }

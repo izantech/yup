@@ -16,6 +16,7 @@ impl PackageManager for RustupManager {
             kind: ActionKind::Update,
             command: "rustup update".to_string(),
             description: "Update all installed Rust toolchains".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -30,6 +31,7 @@ impl PackageManager for RustupManager {
             kind: ActionKind::Check,
             command: "rustup check".to_string(),
             description: "Check for Rust toolchain updates".to_string(),
+            requires_privilege: false,
         }]
     }
 

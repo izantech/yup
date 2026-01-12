@@ -8,10 +8,10 @@ Thank you for your interest in contributing to `yup`!
 
 Please open a GitHub Issue and include:
 - Your operating system and version
-- Output of `up --version`
+- Output of `yup --version`
 - Steps to reproduce the issue
 - Expected vs actual behavior
-- Relevant log output (run `up log` to view logs)
+- Relevant log output (run `yup log` to view logs)
 
 ### Feature Requests
 

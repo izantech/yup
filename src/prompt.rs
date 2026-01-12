@@ -52,7 +52,15 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
         println!("  (no actions available for selected managers)\n");
     } else {
         for action in &actions {
-            println!("  {} - {}", action.command, action.description);
+            let sudo_marker = if action.requires_privilege {
+                " [sudo]"
+            } else {
+                ""
+            };
+            println!(
+                "  {} - {}{}",
+                action.command, action.description, sudo_marker
+            );
         }
         println!();
     }

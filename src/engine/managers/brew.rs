@@ -16,6 +16,7 @@ impl PackageManager for BrewManager {
             kind: ActionKind::Update,
             command: "brew update".to_string(),
             description: "Update Homebrew formulae".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -26,12 +27,14 @@ impl PackageManager for BrewManager {
                 kind: ActionKind::Upgrade,
                 command: "brew upgrade".to_string(),
                 description: "Upgrade Homebrew packages".to_string(),
+                requires_privilege: false,
             },
             Action {
                 manager: Manager::Brew,
                 kind: ActionKind::Upgrade,
                 command: "brew upgrade --cask".to_string(),
                 description: "Upgrade Homebrew casks".to_string(),
+                requires_privilege: false,
             },
         ]
     }
@@ -43,12 +46,14 @@ impl PackageManager for BrewManager {
                 kind: ActionKind::Check,
                 command: "brew outdated".to_string(),
                 description: "Check for outdated Homebrew formulae".to_string(),
+                requires_privilege: false,
             },
             Action {
                 manager: Manager::Brew,
                 kind: ActionKind::Check,
                 command: "brew outdated --cask".to_string(),
                 description: "Check for outdated Homebrew casks".to_string(),
+                requires_privilege: false,
             },
         ]
     }

@@ -16,6 +16,7 @@ impl PackageManager for ComposerManager {
             kind: ActionKind::Update,
             command: "composer self-update".to_string(),
             description: "Update Composer itself".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for ComposerManager {
             kind: ActionKind::Upgrade,
             command: "composer global update".to_string(),
             description: "Update global Composer packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

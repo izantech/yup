@@ -21,6 +21,7 @@ impl PackageManager for SoftwareUpdateManager {
             kind: ActionKind::Upgrade,
             command: "softwareupdate -ia".to_string(),
             description: "Install all macOS updates (may require restart)".to_string(),
+            requires_privilege: true,
         }]
     }
 

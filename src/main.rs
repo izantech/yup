@@ -2,6 +2,8 @@ mod cli;
 mod config;
 mod engine;
 mod prompt;
+#[cfg(unix)]
+mod sudo;
 
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -132,11 +134,41 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
         return Ok(());
     }
 
+    // Check for privileged actions (Unix only)
+    #[cfg(unix)]
+    let needs_sudo = actions.iter().any(|a| a.requires_privilege);
+
+    // Refresh sudo credentials if needed (Unix only)
+    #[cfg(unix)]
+    if needs_sudo {
+        if !sudo::is_sudo_available() {
+            anyhow::bail!("Sudo is required but not available on this system");
+        }
+        if !sudo::has_valid_credentials().await {
+            println!("Refreshing sudo credentials...");
+            if !sudo::refresh_credentials().await? {
+                anyhow::bail!("Failed to obtain sudo credentials");
+            }
+            println!();
+        }
+    }
+
     println!("Checking for outdated packages...\n");
 
     for action in &actions {
         println!("[{}] {}", action.manager, action.description);
-        match execute_command(&action.command).await {
+
+        // Prepend sudo if needed on Unix
+        #[cfg(unix)]
+        let cmd = if action.requires_privilege {
+            sudo::with_sudo(&action.command)
+        } else {
+            action.command.clone()
+        };
+        #[cfg(not(unix))]
+        let cmd = action.command.clone();
+
+        match execute_command(&cmd).await {
             Ok(_) => {}
             Err(e) => {
                 println!("  Error: {}\n", e);
@@ -174,15 +206,38 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
     // Display planned actions
     println!("Planned actions ({}):", actions.len());
     for (i, action) in actions.iter().enumerate() {
+        let sudo_marker = if action.requires_privilege {
+            " [sudo]"
+        } else {
+            ""
+        };
         println!(
-            "  {}. {}: {} - {}",
+            "  {}. {}: {} - {}{}",
             i + 1,
             action.manager,
             action.command,
-            action.description
+            action.description,
+            sudo_marker
         );
     }
     println!();
+
+    // Check for privileged actions (Unix only)
+    #[cfg(unix)]
+    let needs_sudo = actions.iter().any(|a| a.requires_privilege);
+    #[cfg(not(unix))]
+    let needs_sudo = false;
+
+    // Show sudo warning if applicable
+    #[cfg(unix)]
+    if needs_sudo {
+        let privileged_count = actions.iter().filter(|a| a.requires_privilege).count();
+        println!(
+            "Note: {} action(s) require sudo privileges.",
+            privileged_count
+        );
+        println!();
+    }
 
     // If dry-run, just show what would happen
     if args.dry_run {
@@ -206,6 +261,23 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
 
     println!();
 
+    // Refresh sudo credentials if needed (Unix only)
+    #[cfg(unix)]
+    if needs_sudo {
+        if !sudo::is_sudo_available() {
+            anyhow::bail!("Sudo is required but not available on this system");
+        }
+
+        // Check if we already have valid credentials
+        if !sudo::has_valid_credentials().await {
+            println!("Refreshing sudo credentials...");
+            if !sudo::refresh_credentials().await? {
+                anyhow::bail!("Failed to obtain sudo credentials");
+            }
+            println!();
+        }
+    }
+
     let total = actions.len();
     let mut success_count = 0;
     let mut failed_actions: Vec<(usize, String, String)> = Vec::new();
@@ -223,11 +295,21 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
     for (i, action) in actions.iter().enumerate() {
         let start = Instant::now();
 
+        // Determine the actual command to run (prepend sudo if needed on Unix)
+        #[cfg(unix)]
+        let cmd_to_run = if action.requires_privilege {
+            sudo::with_sudo(&action.command)
+        } else {
+            action.command.clone()
+        };
+        #[cfg(not(unix))]
+        let cmd_to_run = action.command.clone();
+
         // Update progress bar message with current action
         progress.set_message(format!("{} - {}", action.command, action.description));
 
         // Execute command with progress integration
-        let result = execute_command_with_progress(&action.command, args.verbose, &progress).await;
+        let result = execute_command_with_progress(&cmd_to_run, args.verbose, &progress).await;
 
         let elapsed = start.elapsed();
 

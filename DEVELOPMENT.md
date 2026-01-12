@@ -8,6 +8,7 @@ src/
 ├── cli.rs            # Clap CLI argument definitions
 ├── config.rs         # Config loading/saving (TOML)
 ├── prompt.rs         # Interactive wizard (dialoguer)
+├── sudo.rs           # Sudo credential management (Unix only)
 └── engine/
     ├── mod.rs        # Module exports
     ├── types.rs      # Core types: Manager, Action, DetectedTool, ScanReport
@@ -35,7 +36,7 @@ src/
 ```rust
 // src/engine/types.rs
 enum Manager { Brew, Npm, Asdf, Nvm, ... }  // All supported managers
-struct Action { manager, kind, command, description }
+struct Action { manager, kind, command, description, requires_privilege }
 struct ScanReport { detected_tools, available_managers, actionable_managers }
 ```
 
@@ -87,6 +88,7 @@ impl PackageManager for MyManagerManager {
             kind: ActionKind::Update,
             command: "mymanager refresh".to_string(),
             description: "Refresh MyManager index".to_string(),
+            requires_privilege: false,  // Set true if needs sudo
         }]
     }
 
@@ -96,6 +98,7 @@ impl PackageManager for MyManagerManager {
             kind: ActionKind::Upgrade,
             command: "mymanager upgrade --all".to_string(),
             description: "Upgrade MyManager packages".to_string(),
+            requires_privilege: false,  // Set true if needs sudo
         }]
     }
 

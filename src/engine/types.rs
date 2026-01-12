@@ -82,6 +82,8 @@ pub struct Action {
     pub kind: ActionKind,
     pub command: String,
     pub description: String,
+    /// Whether this action requires root/admin privileges (sudo on Unix)
+    pub requires_privilege: bool,
 }
 
 /// Result of scanning the system

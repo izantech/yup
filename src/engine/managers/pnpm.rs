@@ -16,6 +16,7 @@ impl PackageManager for PnpmManager {
             kind: ActionKind::Update,
             command: "pnpm self-update".to_string(),
             description: "Update pnpm itself".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -25,6 +26,7 @@ impl PackageManager for PnpmManager {
             kind: ActionKind::Upgrade,
             command: "pnpm update -g".to_string(),
             description: "Update global pnpm packages".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -34,6 +36,7 @@ impl PackageManager for PnpmManager {
             kind: ActionKind::Check,
             command: "pnpm outdated -g".to_string(),
             description: "Check for outdated global pnpm packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

@@ -152,6 +152,20 @@ Logs are stored in platform-appropriate directories:
 
 Daily rotation with filenames like `yup.2026-01-11.log`.
 
+## Privilege Handling
+
+Some package managers require root/admin privileges (sudo) to run updates:
+
+- **Linux:** apt, dnf, pacman, snap
+- **macOS:** port, mas, softwareupdate
+
+When privileged commands are queued, `yup` will:
+1. Show `[sudo]` markers next to commands that need elevation
+2. Prompt for your password once before execution (via `sudo -v`)
+3. Automatically prepend `sudo` to those commands
+
+This means you only enter your password once, not for each command.
+
 ## Requirements
 
 - macOS, Linux, or Windows

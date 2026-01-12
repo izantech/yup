@@ -17,6 +17,7 @@ impl PackageManager for NvmManager {
             kind: ActionKind::Update,
             command: r#"bash -c 'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}" && . "$NVM_DIR/nvm.sh" && nvm install-latest-npm'"#.to_string(),
             description: "Update npm to latest for current Node".to_string(),
+            requires_privilege: false,
         }]
     }
 

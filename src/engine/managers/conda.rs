@@ -16,6 +16,7 @@ impl PackageManager for CondaManager {
             kind: ActionKind::Update,
             command: "conda update -n base conda -y".to_string(),
             description: "Update conda itself".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -26,6 +27,7 @@ impl PackageManager for CondaManager {
             kind: ActionKind::Upgrade,
             command: "conda update -n base --all -y".to_string(),
             description: "Update all packages in base environment".to_string(),
+            requires_privilege: false,
         }]
     }
 

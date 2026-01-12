@@ -16,6 +16,7 @@ impl PackageManager for VoltaManager {
             kind: ActionKind::Update,
             command: "volta setup".to_string(),
             description: "Update Volta".to_string(),
+            requires_privilege: false,
         }]
     }
 

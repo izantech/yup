@@ -22,6 +22,7 @@ impl PackageManager for PipxManager {
             kind: ActionKind::Upgrade,
             command: "pipx upgrade-all".to_string(),
             description: "Upgrade all pipx-installed packages".to_string(),
+            requires_privilege: false,
         }]
     }
 

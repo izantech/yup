@@ -17,12 +17,14 @@ impl PackageManager for MiseManager {
                 kind: ActionKind::Update,
                 command: "mise self-update".to_string(),
                 description: "Update mise itself".to_string(),
+                requires_privilege: false,
             },
             Action {
                 manager: Manager::Mise,
                 kind: ActionKind::Update,
                 command: "mise plugins update".to_string(),
                 description: "Update all mise plugins".to_string(),
+                requires_privilege: false,
             },
         ]
     }
@@ -33,6 +35,7 @@ impl PackageManager for MiseManager {
             kind: ActionKind::Upgrade,
             command: "mise upgrade".to_string(),
             description: "Upgrade all mise-managed tools".to_string(),
+            requires_privilege: false,
         }]
     }
 
@@ -42,6 +45,7 @@ impl PackageManager for MiseManager {
             kind: ActionKind::Check,
             command: "mise outdated".to_string(),
             description: "Check for outdated mise-managed tools".to_string(),
+            requires_privilege: false,
         }]
     }
 

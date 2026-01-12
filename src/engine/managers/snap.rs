@@ -21,6 +21,7 @@ impl PackageManager for SnapManager {
             kind: ActionKind::Upgrade,
             command: "snap refresh".to_string(),
             description: "Refresh all Snap packages".to_string(),
+            requires_privilege: true,
         }]
     }
 

@@ -16,6 +16,7 @@ impl PackageManager for RbenvManager {
             kind: ActionKind::Update,
             command: "rbenv rehash".to_string(),
             description: "Rehash rbenv shims".to_string(),
+            requires_privilege: false,
         }]
     }
 
