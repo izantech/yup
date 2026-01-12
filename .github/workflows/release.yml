@@ -355,6 +355,7 @@ jobs:
       - host
     if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' }}
     runs-on: windows-latest
+    continue-on-error: true  # Don't fail the whole release if Chocolatey fails
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
