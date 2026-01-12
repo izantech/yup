@@ -158,11 +158,8 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
         #[cfg(not(unix))]
         let cmd = action.command.clone();
 
-        match execute_command(&cmd, OutputMode::Stream).await {
-            Ok(_) => {}
-            Err(e) => {
-                println!("  Error: {}\n", e);
-            }
+        if let Err(e) = execute_command(&cmd, OutputMode::Stream).await {
+            println!("  Error: {}\n", e);
         }
         println!();
     }
@@ -263,7 +260,7 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
     progress.set_style(
         ProgressStyle::default_bar()
             .template("{spinner:.green} [{bar:25.cyan/dim}] {pos}/{len} {msg}")
-            .unwrap()
+            .expect("valid progress bar template")
             .progress_chars("=> "),
     );
     progress.enable_steady_tick(Duration::from_millis(100));
@@ -399,9 +396,10 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
                 if stream {
                     println!("      {}", line);
                 } else if let Some(progress) = progress
-                    && verbose {
-                        progress.suspend(|| println!("      {}", line));
-                    }
+                    && verbose
+                {
+                    progress.suspend(|| println!("      {}", line));
+                }
             }
         }
         Ok::<(), anyhow::Error>(())
@@ -433,13 +431,16 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
 
     // If command failed and not verbose, print stderr for debugging
     if let OutputMode::Progress { progress, verbose } = mode
-        && !status.success() && !verbose && !stderr_output.is_empty() {
-            progress.suspend(|| {
-                for line in &stderr_output {
-                    println!("      [err] {}", line);
-                }
-            });
-        }
+        && !status.success()
+        && !verbose
+        && !stderr_output.is_empty()
+    {
+        progress.suspend(|| {
+            for line in &stderr_output {
+                println!("      [err] {}", line);
+            }
+        });
+    }
 
     Ok(status.success())
 }

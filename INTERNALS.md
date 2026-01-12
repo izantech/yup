@@ -44,16 +44,8 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 
 | Manager | Commands |
 |---------|----------|
-| **asdf** | `asdf plugin update --all` |
 | **mise** | `mise self-update`<br>`mise plugins update`<br>`mise upgrade`<br>`mise outdated` |
-| **pyenv** | `pyenv update` |
-| **rbenv** | `rbenv rehash` |
-| **rvm** | `bash -c 'source "${rvm_path:-$HOME/.rvm}/scripts/rvm" && rvm get stable'` |
-| **nvm** | `bash -c 'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}" && . "$NVM_DIR/nvm.sh" && nvm install-latest-npm'` |
-| **fnm** | - |
-| **volta** | `volta setup` |
 | **conda** | `conda update -n base conda -y`<br>`conda update -n base --all -y` |
-| **sdkman** | `bash -c 'source "${SDKMAN_DIR:-$HOME/.sdkman}/bin/sdkman-init.sh" && sdk selfupdate'`<br>`bash -c 'source "${SDKMAN_DIR:-$HOME/.sdkman}/bin/sdkman-init.sh" && sdk update'` |
 
 ### Language Package Managers
 
@@ -61,16 +53,7 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 |---------|----------|
 | **npm** | `npm update -g`<br>`npm outdated -g` |
 | **pnpm** | `pnpm self-update`<br>`pnpm update -g`<br>`pnpm outdated -g` |
-| **yarn** | `yarn set version stable` |
-| **bun** | `bun upgrade` |
-| **pip** | `pip install --upgrade pip`<br>`pip list --outdated` |
 | **pipx** | `pipx upgrade-all` |
-| **poetry** | `poetry self update` |
-| **uv** | `uv self update` |
 | **gem** | `gem update --system`<br>`gem update`<br>`gem outdated` |
 | **rustup** | `rustup update`<br>`rustup check` |
 | **cargo** | `cargo install-update -a`<br>`cargo install-update -l` |
-| **go** | - |
-| **composer** | `composer self-update`<br>`composer global update` |
-| **helm** | `helm repo update` |
-| **krew** | `kubectl krew update`<br>`kubectl krew upgrade` |

@@ -22,7 +22,9 @@
 
 
 # Added by cargo
-
 /target
+
+# Local files
+*local.json
 .serena/
 .plans/

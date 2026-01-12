@@ -22,137 +22,96 @@ pub trait PackageManager {
     }
 }
 
-/// Check if a command exists in PATH
-pub fn command_exists(cmd: &str) -> bool {
-    which::which(cmd).is_ok()
+/// Declarative macro for defining package manager modules with less boilerplate.
+///
+/// This macro generates:
+/// 1. Module declarations with appropriate cfg attributes
+/// 2. Public re-exports of manager structs
+/// 3. The entire `create_manager()` factory function
+///
+/// # Usage
+/// ```ignore
+/// declare_managers! {
+///     // Cross-platform managers (no attributes)
+///     Cargo => cargo::CargoManager,
+///     Npm   => npm::NpmManager,
+///
+///     // Platform-specific managers (with cfg attributes)
+///     #[cfg(target_os = "macos")]
+///     Brew => brew::BrewManager,
+///
+///     #[cfg(target_os = "linux")]
+///     Apt => apt::AptManager,
+/// }
+/// ```
+macro_rules! declare_managers {
+    (
+        $(
+            $(#[$meta:meta])*
+            $variant:ident => $mod_name:ident :: $struct_name:ident
+        ),+ $(,)?
+    ) => {
+        $(
+            $(#[$meta])*
+            mod $mod_name;
+
+            $(#[$meta])*
+            pub use $mod_name::$struct_name;
+        )+
+
+        /// Create a PackageManager from a Manager enum variant.
+        /// Returns None if no implementation exists for this Manager.
+        pub fn create_manager(manager: Manager) -> Option<Box<dyn PackageManager>> {
+            match manager {
+                $(
+                    $(#[$meta])*
+                    Manager::$variant => Some(Box::new($struct_name)),
+                )+
+                _ => None,
+            }
+        }
+    };
 }
 
-// macOS managers
-#[cfg(target_os = "macos")]
-mod brew;
-#[cfg(target_os = "macos")]
-mod mas;
-#[cfg(target_os = "macos")]
-mod port;
-#[cfg(target_os = "macos")]
-mod softwareupdate;
+// Package managers - all platforms
+declare_managers! {
+    // Cross-platform managers (8 total)
+    Conda  => conda::CondaManager,
+    Mise   => mise::MiseManager,
+    Cargo  => cargo::CargoManager,
+    Gem    => gem::GemManager,
+    Npm    => npm::NpmManager,
+    Pipx   => pipx::PipxManager,
+    Pnpm   => pnpm::PnpmManager,
+    Rustup => rustup::RustupManager,
 
-#[cfg(target_os = "macos")]
-pub use brew::BrewManager;
-#[cfg(target_os = "macos")]
-pub use mas::MasManager;
-#[cfg(target_os = "macos")]
-pub use port::PortManager;
-#[cfg(target_os = "macos")]
-pub use softwareupdate::SoftwareUpdateManager;
+    // macOS managers (4 total)
+    #[cfg(target_os = "macos")]
+    Brew => brew::BrewManager,
+    #[cfg(target_os = "macos")]
+    Mas => mas::MasManager,
+    #[cfg(target_os = "macos")]
+    Port => port::PortManager,
+    #[cfg(target_os = "macos")]
+    SoftwareUpdate => softwareupdate::SoftwareUpdateManager,
 
-// Linux managers
-#[cfg(target_os = "linux")]
-mod apt;
-#[cfg(target_os = "linux")]
-mod dnf;
-#[cfg(target_os = "linux")]
-mod flatpak;
-#[cfg(target_os = "linux")]
-mod pacman;
-#[cfg(target_os = "linux")]
-mod snap;
+    // Linux managers (5 total)
+    #[cfg(target_os = "linux")]
+    Apt => apt::AptManager,
+    #[cfg(target_os = "linux")]
+    Dnf => dnf::DnfManager,
+    #[cfg(target_os = "linux")]
+    Flatpak => flatpak::FlatpakManager,
+    #[cfg(target_os = "linux")]
+    Pacman => pacman::PacmanManager,
+    #[cfg(target_os = "linux")]
+    Snap => snap::SnapManager,
 
-#[cfg(target_os = "linux")]
-pub use apt::AptManager;
-#[cfg(target_os = "linux")]
-pub use dnf::DnfManager;
-#[cfg(target_os = "linux")]
-pub use flatpak::FlatpakManager;
-#[cfg(target_os = "linux")]
-pub use pacman::PacmanManager;
-#[cfg(target_os = "linux")]
-pub use snap::SnapManager;
-
-// Windows managers
-#[cfg(target_os = "windows")]
-mod choco;
-#[cfg(target_os = "windows")]
-mod scoop;
-#[cfg(target_os = "windows")]
-mod winget;
-
-#[cfg(target_os = "windows")]
-pub use choco::ChocoManager;
-#[cfg(target_os = "windows")]
-pub use scoop::ScoopManager;
-#[cfg(target_os = "windows")]
-pub use winget::WingetManager;
-
-// Version managers (cross-platform)
-mod conda;
-mod mise;
-
-pub use conda::CondaManager;
-pub use mise::MiseManager;
-
-// Language managers (cross-platform)
-mod cargo;
-mod gem;
-mod npm;
-mod pipx;
-mod pnpm;
-mod rustup;
-
-pub use cargo::CargoManager;
-pub use gem::GemManager;
-pub use npm::NpmManager;
-pub use pipx::PipxManager;
-pub use pnpm::PnpmManager;
-pub use rustup::RustupManager;
-
-/// Create a PackageManager from a Manager enum variant.
-/// Returns None if no implementation exists for this Manager.
-pub fn create_manager(manager: Manager) -> Option<Box<dyn PackageManager>> {
-    match manager {
-        // macOS managers
-        #[cfg(target_os = "macos")]
-        Manager::Brew => Some(Box::new(BrewManager)),
-        #[cfg(target_os = "macos")]
-        Manager::Port => Some(Box::new(PortManager)),
-        #[cfg(target_os = "macos")]
-        Manager::Mas => Some(Box::new(MasManager)),
-        #[cfg(target_os = "macos")]
-        Manager::SoftwareUpdate => Some(Box::new(SoftwareUpdateManager)),
-
-        // Linux managers
-        #[cfg(target_os = "linux")]
-        Manager::Apt => Some(Box::new(AptManager)),
-        #[cfg(target_os = "linux")]
-        Manager::Dnf => Some(Box::new(DnfManager)),
-        #[cfg(target_os = "linux")]
-        Manager::Pacman => Some(Box::new(PacmanManager)),
-        #[cfg(target_os = "linux")]
-        Manager::Flatpak => Some(Box::new(FlatpakManager)),
-        #[cfg(target_os = "linux")]
-        Manager::Snap => Some(Box::new(SnapManager)),
-
-        // Windows managers
-        #[cfg(target_os = "windows")]
-        Manager::Winget => Some(Box::new(WingetManager)),
-        #[cfg(target_os = "windows")]
-        Manager::Choco => Some(Box::new(ChocoManager)),
-        #[cfg(target_os = "windows")]
-        Manager::Scoop => Some(Box::new(ScoopManager)),
-
-        // Version managers (cross-platform)
-        Manager::Mise => Some(Box::new(MiseManager)),
-        Manager::Conda => Some(Box::new(CondaManager)),
-
-        // Language managers (cross-platform)
-        Manager::Npm => Some(Box::new(NpmManager)),
-        Manager::Pnpm => Some(Box::new(PnpmManager)),
-        Manager::Pipx => Some(Box::new(PipxManager)),
-        Manager::Gem => Some(Box::new(GemManager)),
-        Manager::Rustup => Some(Box::new(RustupManager)),
-        Manager::Cargo => Some(Box::new(CargoManager)),
-
-        // No implementation yet or not applicable
-        _ => None,
-    }
+    // Windows managers (3 total)
+    #[cfg(target_os = "windows")]
+    Choco => choco::ChocoManager,
+    #[cfg(target_os = "windows")]
+    Scoop => scoop::ScoopManager,
+    #[cfg(target_os = "windows")]
+    Winget => winget::WingetManager,
 }

@@ -3,7 +3,7 @@ name = "yup"
 version = "0.1.2"
 edition = "2024"
 authors = ["izantech"]
-description = "Safe, cross-platform updater for development tools"
+description = "One command to update packages across all your managers."
 license = "MIT"
 repository = "https://github.com/izantech/yup"
 keywords = ["cli", "update", "package-manager", "devtools"]
@@ -22,6 +22,7 @@ toml = "0.8"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 tracing-appender = "0.2"
+strum = { version = "0.27", features = ["derive"] }
 which = "8.0.0"
 
 [dev-dependencies]

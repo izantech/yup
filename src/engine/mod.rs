@@ -1,4 +1,3 @@
-mod detect;
 mod filter;
 pub mod managers;
 pub mod scan;

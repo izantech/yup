@@ -1,13 +1,13 @@
 //! cargo package manager
 
-use super::{command_exists, Action, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 /// Cargo - Rust package manager
 pub struct CargoManager;
 
 /// Check if cargo-install-update is available
-fn cargo_update_available() -> bool {
-    command_exists("cargo-install-update")
+fn is_cargo_update_available() -> bool {
+    which::which("cargo-install-update").is_ok()
 }
 
 impl PackageManager for CargoManager {
@@ -18,7 +18,7 @@ impl PackageManager for CargoManager {
 
     fn upgrade_actions(&self) -> Vec<Action> {
         // Only offer upgrade if cargo-install-update is installed
-        if cargo_update_available() {
+        if is_cargo_update_available() {
             vec![Action::new(
                 Manager::Cargo,
                 "cargo install-update -a",
@@ -31,7 +31,7 @@ impl PackageManager for CargoManager {
     }
 
     fn check_actions(&self) -> Vec<Action> {
-        if cargo_update_available() {
+        if is_cargo_update_available() {
             vec![Action::new(
                 Manager::Cargo,
                 "cargo install-update -l",

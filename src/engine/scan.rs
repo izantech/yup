@@ -1,111 +1,44 @@
-use std::fs;
-
-use tracing::debug;
+use strum::IntoEnumIterator;
 use which::which;
 
-use super::detect::detect_manager;
 use super::managers::create_manager;
-use super::types::{Action, DetectedTool, Manager, ScanReport};
+use super::types::{Action, Manager, ScanReport};
 
-/// List of tools to scan for and their expected managers.
-const TOOL_MANAGERS: &[(&str, Manager)] = &[
-    // System package managers
-    ("brew", Manager::Brew),
-    ("port", Manager::Port),
-    ("mas", Manager::Mas),
-    ("softwareupdate", Manager::SoftwareUpdate),
-    // Version managers (with global upgrade support)
-    ("mise", Manager::Mise),
-    ("conda", Manager::Conda),
-    // Node.js ecosystem
-    ("npm", Manager::Npm),
-    ("pnpm", Manager::Pnpm),
-    // Python ecosystem (pipx only - pip intentionally excluded)
-    ("pipx", Manager::Pipx),
-    // Ruby ecosystem
-    ("gem", Manager::Gem),
-    // Rust ecosystem
-    ("rustup", Manager::Rustup),
-    ("cargo", Manager::Cargo),
-    // Windows package managers
-    ("choco", Manager::Choco),
-    ("winget", Manager::Winget),
-    ("scoop", Manager::Scoop),
-];
-
-/// Scan the system for installed tools and detect their managers
+/// Scan the system for installed tools and detect their managers.
 pub fn scan() -> ScanReport {
-    let mut report = ScanReport::default();
+    let available_managers = Manager::iter()
+        .filter(|manager| which(&manager.as_ref().to_lowercase()).is_ok())
+        .collect();
 
-    for &(tool_name, manager) in TOOL_MANAGERS {
-        if let Some(detected) = detect_tool(tool_name, manager) {
-            debug!(
-                tool = tool_name,
-                manager = ?detected.manager,
-                path = %detected.path.display(),
-                "Detected tool"
-            );
-            report.available_managers.insert(detected.manager);
-            report.detected_tools.push(detected);
-        }
+    ScanReport {
+        available_managers,
+        actionable_managers: Default::default(),
     }
-
-    // Compute actionable managers (those with implementations AND actions)
-    for manager in &report.available_managers {
-        if let Some(pkg_manager) = create_manager(*manager)
-            && (!pkg_manager.update_actions().is_empty() || !pkg_manager.upgrade_actions().is_empty())
-            {
-                report.actionable_managers.insert(*manager);
-            }
-    }
-
-    report
-}
-
-fn detect_tool(name: &str, manager: Manager) -> Option<DetectedTool> {
-    let path = which(name).ok()?;
-
-    // Resolve symlinks to get real path
-    let resolved = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
-
-    // Package manager CLIs map directly to their manager regardless of installation path.
-    let resolved_manager = if manager == Manager::Unknown {
-        detect_manager(&resolved)
-    } else {
-        manager
-    };
-
-    Some(DetectedTool {
-        path: resolved,
-        manager: resolved_manager,
-    })
 }
 
 /// Get actions for managers detected in the scan.
 /// Only returns actions for managers that were actually detected on the system.
 pub fn get_actions_for_scan(report: &ScanReport) -> Vec<Action> {
-    let mut actions = Vec::new();
-
-    for manager in &report.available_managers {
-        if let Some(pkg_manager) = create_manager(*manager) {
-            actions.extend(pkg_manager.update_actions());
-            actions.extend(pkg_manager.upgrade_actions());
-        }
-    }
-
-    actions
+    report
+        .available_managers
+        .iter()
+        .filter_map(|&manager| create_manager(manager))
+        .flat_map(|pkg_manager| {
+            pkg_manager
+                .update_actions()
+                .into_iter()
+                .chain(pkg_manager.upgrade_actions())
+        })
+        .collect()
 }
 
 /// Get check actions for managers detected in the scan.
 /// Returns actions to check for outdated packages without updating.
 pub fn get_check_actions_for_scan(report: &ScanReport) -> Vec<Action> {
-    let mut actions = Vec::new();
-
-    for manager in &report.available_managers {
-        if let Some(pkg_manager) = create_manager(*manager) {
-            actions.extend(pkg_manager.check_actions());
-        }
-    }
-
-    actions
+    report
+        .available_managers
+        .iter()
+        .filter_map(|&manager| create_manager(manager))
+        .flat_map(|pkg_manager| pkg_manager.check_actions())
+        .collect()
 }
