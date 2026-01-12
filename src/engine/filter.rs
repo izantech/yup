@@ -75,10 +75,10 @@ mod tests {
         let actions = vec![
             make_action(Manager::Brew),
             make_action(Manager::Npm),
-            make_action(Manager::Pip),
+            make_action(Manager::Pipx),
         ];
 
-        let skip = vec!["npm".to_string(), "pip".to_string()];
+        let skip = vec!["npm".to_string(), "pipx".to_string()];
         let filtered = filter_actions(actions, None, Some(&skip));
 
         assert_eq!(filtered.len(), 1);
