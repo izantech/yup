@@ -14,37 +14,23 @@ const TOOLS: &[&str] = &[
     "port",
     "mas",
     "softwareupdate",
-    // Version managers
-    "asdf",
+    // Version managers (with global upgrade support)
     "mise",
-    "pyenv",
-    "rbenv",
-    "rvm",
-    "nvm",
-    "fnm",
-    "volta",
     "conda",
     // Node.js ecosystem
-    "node",
     "npm",
     "pnpm",
-    "yarn",
-    "bun",
-    // Python ecosystem
-    "python3",
-    "pip3",
+    // Python ecosystem (pipx only - pip intentionally excluded)
     "pipx",
-    "poetry",
-    "uv",
     // Ruby ecosystem
-    "ruby",
     "gem",
     // Rust ecosystem
     "rustup",
     "cargo",
-    // Other languages
-    "go",
-    "composer",
+    // Windows package managers
+    "choco",
+    "winget",
+    "scoop",
 ];
 
 /// Scan the system for installed tools and detect their managers
@@ -84,44 +70,30 @@ fn detect_tool(name: &str) -> Option<DetectedTool> {
     let resolved = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
 
     // Package manager CLIs map directly to their manager regardless of installation path.
-    // Only runtime binaries (node, python3, ruby) use path-based detection to determine
-    // which version manager controls them.
     let manager = match name {
         // System package managers
         "brew" => Manager::Brew,
         "port" => Manager::Port,
         "mas" => Manager::Mas,
         "softwareupdate" => Manager::SoftwareUpdate,
-        // Version managers
-        "asdf" => Manager::Asdf,
+        // Version managers (with global upgrade support)
         "mise" => Manager::Mise,
-        "pyenv" => Manager::Pyenv,
-        "rbenv" => Manager::Rbenv,
-        "rvm" => Manager::Rvm,
-        "nvm" => Manager::Nvm,
-        "fnm" => Manager::Fnm,
-        "volta" => Manager::Volta,
         "conda" => Manager::Conda,
         // Node.js package managers
         "npm" => Manager::Npm,
         "pnpm" => Manager::Pnpm,
-        "yarn" => Manager::Yarn,
-        "bun" => Manager::Bun,
         // Python package managers
-        "pip3" => Manager::Pip,
         "pipx" => Manager::Pipx,
-        "poetry" => Manager::Poetry,
-        "uv" => Manager::Uv,
         // Ruby package managers
         "gem" => Manager::Gem,
         // Rust tools
         "rustup" => Manager::Rustup,
         "cargo" => Manager::Cargo,
-        // Other
-        "go" => Manager::Go,
-        "composer" => Manager::Composer,
-        // Runtime binaries - detect based on path to find their version manager
-        // (e.g., node might be from nvm, fnm, volta, asdf, brew, etc.)
+        // Windows package managers
+        "choco" => Manager::Choco,
+        "winget" => Manager::Winget,
+        "scoop" => Manager::Scoop,
+        // Unknown tools - try path-based detection
         _ => detect_manager(&resolved),
     };
 

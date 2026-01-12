@@ -89,60 +89,26 @@ pub use scoop::ScoopManager;
 pub use winget::WingetManager;
 
 // Version managers (cross-platform)
-mod asdf;
 mod conda;
-mod fnm;
 mod mise;
-mod nvm;
-mod pyenv;
-mod rbenv;
-mod rvm;
-mod volta;
 
-pub use asdf::AsdfManager;
 pub use conda::CondaManager;
-pub use fnm::FnmManager;
 pub use mise::MiseManager;
-pub use nvm::NvmManager;
-pub use pyenv::PyenvManager;
-pub use rbenv::RbenvManager;
-pub use rvm::RvmManager;
-pub use volta::VoltaManager;
 
 // Language managers (cross-platform)
-mod bun;
 mod cargo;
-mod composer;
 mod gem;
-mod go;
-mod helm;
-mod krew;
 mod npm;
-mod pip;
 mod pipx;
 mod pnpm;
-mod poetry;
 mod rustup;
-mod sdkman;
-mod uv;
-mod yarn;
 
-pub use bun::BunManager;
 pub use cargo::CargoManager;
-pub use composer::ComposerManager;
 pub use gem::GemManager;
-pub use go::GoManager;
-pub use helm::HelmManager;
-pub use krew::KrewManager;
 pub use npm::NpmManager;
-pub use pip::PipManager;
 pub use pipx::PipxManager;
 pub use pnpm::PnpmManager;
-pub use poetry::PoetryManager;
 pub use rustup::RustupManager;
-pub use sdkman::SdkmanManager;
-pub use uv::UvManager;
-pub use yarn::YarnManager;
 
 /// Create a PackageManager from a Manager enum variant.
 /// Returns None if no implementation exists for this Manager.
@@ -179,33 +145,16 @@ pub fn create_manager(manager: Manager) -> Option<Box<dyn PackageManager>> {
         Manager::Scoop => Some(Box::new(ScoopManager)),
 
         // Version managers (cross-platform)
-        Manager::Asdf => Some(Box::new(AsdfManager)),
         Manager::Mise => Some(Box::new(MiseManager)),
-        Manager::Pyenv => Some(Box::new(PyenvManager)),
-        Manager::Rbenv => Some(Box::new(RbenvManager)),
-        Manager::Rvm => Some(Box::new(RvmManager)),
-        Manager::Nvm => Some(Box::new(NvmManager)),
-        Manager::Fnm => Some(Box::new(FnmManager)),
-        Manager::Volta => Some(Box::new(VoltaManager)),
         Manager::Conda => Some(Box::new(CondaManager)),
 
         // Language managers (cross-platform)
         Manager::Npm => Some(Box::new(NpmManager)),
         Manager::Pnpm => Some(Box::new(PnpmManager)),
-        Manager::Yarn => Some(Box::new(YarnManager)),
-        Manager::Bun => Some(Box::new(BunManager)),
-        Manager::Pip => Some(Box::new(PipManager)),
         Manager::Pipx => Some(Box::new(PipxManager)),
-        Manager::Poetry => Some(Box::new(PoetryManager)),
-        Manager::Uv => Some(Box::new(UvManager)),
         Manager::Gem => Some(Box::new(GemManager)),
         Manager::Rustup => Some(Box::new(RustupManager)),
         Manager::Cargo => Some(Box::new(CargoManager)),
-        Manager::Go => Some(Box::new(GoManager)),
-        Manager::Composer => Some(Box::new(ComposerManager)),
-        Manager::Helm => Some(Box::new(HelmManager)),
-        Manager::Krew => Some(Box::new(KrewManager)),
-        Manager::Sdkman => Some(Box::new(SdkmanManager)),
 
         // No implementation yet or not applicable
         _ => None,

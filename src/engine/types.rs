@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "lowercase")]
 #[allow(dead_code)] // Platform-specific variants kept for cross-platform support
 pub enum Manager {
-    // System
+    // System package managers
     Brew,
     Port,
     Apt,
@@ -20,36 +20,18 @@ pub enum Manager {
     Winget,
     Choco,
     Scoop,
-    // Version managers
-    Nvm,
-    Fnm,
-    Volta,
-    Asdf,
-    Mise,
-    Pyenv,
-    Rbenv,
-    Rvm,
-    Conda,
-    // Language tools
-    Npm,
-    Pnpm,
-    Yarn,
-    Bun,
-    Pip,
-    Pipx,
-    Poetry,
-    Uv,
-    Cargo,
-    Rustup,
-    Go,
-    Gem,
-    Composer,
-    Helm,
-    Krew,
-    Sdkman,
-    // Other
     Mas,
     SoftwareUpdate,
+    // Version managers (with global upgrade support)
+    Mise,
+    Conda,
+    // Language tools (with global upgrade support)
+    Npm,
+    Pnpm,
+    Pipx,
+    Cargo,
+    Rustup,
+    Gem,
     // Fallback
     System,
     Unknown,
@@ -106,6 +88,7 @@ impl FromStr for Manager {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
+            // System package managers
             "brew" => Ok(Manager::Brew),
             "port" => Ok(Manager::Port),
             "apt" => Ok(Manager::Apt),
@@ -116,33 +99,19 @@ impl FromStr for Manager {
             "winget" => Ok(Manager::Winget),
             "choco" => Ok(Manager::Choco),
             "scoop" => Ok(Manager::Scoop),
-            "nvm" => Ok(Manager::Nvm),
-            "fnm" => Ok(Manager::Fnm),
-            "volta" => Ok(Manager::Volta),
-            "asdf" => Ok(Manager::Asdf),
-            "mise" => Ok(Manager::Mise),
-            "pyenv" => Ok(Manager::Pyenv),
-            "rbenv" => Ok(Manager::Rbenv),
-            "rvm" => Ok(Manager::Rvm),
-            "conda" => Ok(Manager::Conda),
-            "npm" => Ok(Manager::Npm),
-            "pnpm" => Ok(Manager::Pnpm),
-            "yarn" => Ok(Manager::Yarn),
-            "bun" => Ok(Manager::Bun),
-            "pip" => Ok(Manager::Pip),
-            "pipx" => Ok(Manager::Pipx),
-            "poetry" => Ok(Manager::Poetry),
-            "uv" => Ok(Manager::Uv),
-            "cargo" => Ok(Manager::Cargo),
-            "rustup" => Ok(Manager::Rustup),
-            "go" => Ok(Manager::Go),
-            "gem" => Ok(Manager::Gem),
-            "composer" => Ok(Manager::Composer),
-            "helm" => Ok(Manager::Helm),
-            "krew" => Ok(Manager::Krew),
-            "sdkman" => Ok(Manager::Sdkman),
             "mas" => Ok(Manager::Mas),
             "softwareupdate" => Ok(Manager::SoftwareUpdate),
+            // Version managers
+            "mise" => Ok(Manager::Mise),
+            "conda" => Ok(Manager::Conda),
+            // Language tools
+            "npm" => Ok(Manager::Npm),
+            "pnpm" => Ok(Manager::Pnpm),
+            "pipx" => Ok(Manager::Pipx),
+            "cargo" => Ok(Manager::Cargo),
+            "rustup" => Ok(Manager::Rustup),
+            "gem" => Ok(Manager::Gem),
+            // Fallback
             "system" => Ok(Manager::System),
             "unknown" => Ok(Manager::Unknown),
             _ => Err(format!("Unknown manager: {}", s)),
