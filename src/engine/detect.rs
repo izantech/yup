@@ -99,6 +99,30 @@ pub fn detect_manager(path: &Path) -> Manager {
         }
     }
 
+    // CHOCOLATEYINSTALL for Chocolatey (Windows)
+    if let Some(choco_install) = std::env::var_os("CHOCOLATEYINSTALL") {
+        let choco_path = PathBuf::from(choco_install);
+        if path.starts_with(&choco_path) {
+            return Manager::Choco;
+        }
+    }
+
+    // SCOOP for Scoop user installation (Windows)
+    if let Some(scoop_dir) = std::env::var_os("SCOOP") {
+        let scoop_path = PathBuf::from(scoop_dir);
+        if path.starts_with(&scoop_path) {
+            return Manager::Scoop;
+        }
+    }
+
+    // SCOOP_GLOBAL for Scoop global installation (Windows)
+    if let Some(scoop_global) = std::env::var_os("SCOOP_GLOBAL") {
+        let scoop_path = PathBuf::from(scoop_global);
+        if path.starts_with(&scoop_path) {
+            return Manager::Scoop;
+        }
+    }
+
     // === Path pattern checks (fallback to default locations) ===
 
     if let Some(home_dir) = home {
@@ -161,44 +185,104 @@ pub fn detect_manager(path: &Path) -> Manager {
         if path.starts_with(&cargo_bin) {
             return Manager::Cargo;
         }
+
+        // Scoop user default path (under home directory)
+        #[cfg(target_os = "windows")]
+        {
+            let scoop_user = home_dir.join("scoop");
+            if path.starts_with(&scoop_user) {
+                return Manager::Scoop;
+            }
+        }
     }
 
-    // Homebrew paths - dynamic prefix first, then hardcoded fallbacks
-    if let Some(brew_prefix) = get_brew_prefix() {
-        if path.starts_with(brew_prefix) {
-            return Manager::Brew;
-        }
-        // Also check Cellar subdirectory under dynamic prefix
-        let cellar = brew_prefix.join("Cellar");
-        if path.starts_with(&cellar) {
-            return Manager::Brew;
-        }
-    }
-    // Hardcoded fallbacks for when brew command is not available
-    let opt_homebrew = Path::new("/opt/homebrew");
-    let usr_local_cellar = Path::new("/usr/local/Cellar");
-    let usr_local_opt = Path::new("/usr/local/opt");
-    let usr_local = Path::new("/usr/local");
-    if path.starts_with(opt_homebrew)
-        || path.starts_with(usr_local_cellar)
-        || path.starts_with(usr_local_opt)
-        || path.starts_with(usr_local)
+    // === Windows-specific path patterns ===
+    #[cfg(target_os = "windows")]
     {
-        return Manager::Brew;
+        // nvm-windows uses %APPDATA%\nvm
+        if let Some(appdata) = std::env::var_os("APPDATA") {
+            let appdata_path = PathBuf::from(&appdata);
+
+            let nvm_windows = appdata_path.join("nvm");
+            if path.starts_with(&nvm_windows) {
+                return Manager::Nvm;
+            }
+
+            // fnm on Windows may use %APPDATA%\fnm
+            let fnm_appdata = appdata_path.join("fnm");
+            if path.starts_with(&fnm_appdata) {
+                return Manager::Fnm;
+            }
+        }
+
+        // fnm may also use %LOCALAPPDATA%\fnm
+        if let Some(localappdata) = std::env::var_os("LOCALAPPDATA") {
+            let fnm_localappdata = PathBuf::from(localappdata).join("fnm");
+            if path.starts_with(&fnm_localappdata) {
+                return Manager::Fnm;
+            }
+        }
+
+        // Chocolatey default path
+        let choco_default = Path::new(r"C:\ProgramData\chocolatey");
+        if path.starts_with(choco_default) {
+            return Manager::Choco;
+        }
+
+        // Scoop global default path
+        let scoop_global_default = Path::new(r"C:\ProgramData\scoop");
+        if path.starts_with(scoop_global_default) {
+            return Manager::Scoop;
+        }
+
+        // Windows system paths
+        let windows_system32 = Path::new(r"C:\Windows\System32");
+        let windows_dir = Path::new(r"C:\Windows");
+        if path.starts_with(windows_system32) || path.starts_with(windows_dir) {
+            return Manager::System;
+        }
     }
 
-    // MacPorts
-    let opt_local = Path::new("/opt/local");
-    if path.starts_with(opt_local) {
-        return Manager::Port;
-    }
+    // === Unix-specific path patterns ===
+    #[cfg(not(target_os = "windows"))]
+    {
+        // Homebrew paths - dynamic prefix first, then hardcoded fallbacks
+        if let Some(brew_prefix) = get_brew_prefix() {
+            if path.starts_with(brew_prefix) {
+                return Manager::Brew;
+            }
+            // Also check Cellar subdirectory under dynamic prefix
+            let cellar = brew_prefix.join("Cellar");
+            if path.starts_with(&cellar) {
+                return Manager::Brew;
+            }
+        }
+        // Hardcoded fallbacks for when brew command is not available
+        let opt_homebrew = Path::new("/opt/homebrew");
+        let usr_local_cellar = Path::new("/usr/local/Cellar");
+        let usr_local_opt = Path::new("/usr/local/opt");
+        let usr_local = Path::new("/usr/local");
+        if path.starts_with(opt_homebrew)
+            || path.starts_with(usr_local_cellar)
+            || path.starts_with(usr_local_opt)
+            || path.starts_with(usr_local)
+        {
+            return Manager::Brew;
+        }
 
-    // System paths
-    let usr_bin = Path::new("/usr/bin");
-    let usr_sbin = Path::new("/usr/sbin");
-    let bin = Path::new("/bin");
-    if path.starts_with(usr_bin) || path.starts_with(usr_sbin) || path.starts_with(bin) {
-        return Manager::System;
+        // MacPorts
+        let opt_local = Path::new("/opt/local");
+        if path.starts_with(opt_local) {
+            return Manager::Port;
+        }
+
+        // System paths
+        let usr_bin = Path::new("/usr/bin");
+        let usr_sbin = Path::new("/usr/sbin");
+        let bin = Path::new("/bin");
+        if path.starts_with(usr_bin) || path.starts_with(usr_sbin) || path.starts_with(bin) {
+            return Manager::System;
+        }
     }
 
     Manager::Unknown
