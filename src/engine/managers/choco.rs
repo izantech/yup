@@ -1,41 +1,31 @@
 //! Chocolatey package manager
 
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 /// Chocolatey package manager
 pub struct ChocoManager;
 
 impl PackageManager for ChocoManager {
-    fn name(&self) -> &'static str {
-        "Chocolatey"
-    }
-
     fn update_actions(&self) -> Vec<Action> {
         // choco upgrade does both update and upgrade
         vec![]
     }
 
     fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Choco,
-            kind: ActionKind::Upgrade,
-            command: "choco upgrade all -y".to_string(),
-            description: "Upgrade all packages".to_string(),
-            requires_privilege: true,
-        }]
+        vec![Action::new(
+            Manager::Choco,
+            "choco upgrade all -y",
+            "Upgrade all packages",
+            true,
+        )]
     }
 
     fn check_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::Choco,
-            kind: ActionKind::Check,
-            command: "choco outdated".to_string(),
-            description: "Check for outdated packages".to_string(),
-            requires_privilege: false,
-        }]
-    }
-
-    fn requires_privilege(&self) -> bool {
-        true // choco needs admin
+        vec![Action::new(
+            Manager::Choco,
+            "choco outdated",
+            "Check for outdated packages",
+            false,
+        )]
     }
 }

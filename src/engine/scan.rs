@@ -7,38 +7,38 @@ use super::detect::detect_manager;
 use super::managers::create_manager;
 use super::types::{Action, DetectedTool, Manager, ScanReport};
 
-/// List of tools to scan for
-const TOOLS: &[&str] = &[
+/// List of tools to scan for and their expected managers.
+const TOOL_MANAGERS: &[(&str, Manager)] = &[
     // System package managers
-    "brew",
-    "port",
-    "mas",
-    "softwareupdate",
+    ("brew", Manager::Brew),
+    ("port", Manager::Port),
+    ("mas", Manager::Mas),
+    ("softwareupdate", Manager::SoftwareUpdate),
     // Version managers (with global upgrade support)
-    "mise",
-    "conda",
+    ("mise", Manager::Mise),
+    ("conda", Manager::Conda),
     // Node.js ecosystem
-    "npm",
-    "pnpm",
+    ("npm", Manager::Npm),
+    ("pnpm", Manager::Pnpm),
     // Python ecosystem (pipx only - pip intentionally excluded)
-    "pipx",
+    ("pipx", Manager::Pipx),
     // Ruby ecosystem
-    "gem",
+    ("gem", Manager::Gem),
     // Rust ecosystem
-    "rustup",
-    "cargo",
+    ("rustup", Manager::Rustup),
+    ("cargo", Manager::Cargo),
     // Windows package managers
-    "choco",
-    "winget",
-    "scoop",
+    ("choco", Manager::Choco),
+    ("winget", Manager::Winget),
+    ("scoop", Manager::Scoop),
 ];
 
 /// Scan the system for installed tools and detect their managers
 pub fn scan() -> ScanReport {
     let mut report = ScanReport::default();
 
-    for &tool_name in TOOLS {
-        if let Some(detected) = detect_tool(tool_name) {
+    for &(tool_name, manager) in TOOL_MANAGERS {
+        if let Some(detected) = detect_tool(tool_name, manager) {
             debug!(
                 tool = tool_name,
                 manager = ?detected.manager,
@@ -63,44 +63,22 @@ pub fn scan() -> ScanReport {
     report
 }
 
-fn detect_tool(name: &str) -> Option<DetectedTool> {
+fn detect_tool(name: &str, manager: Manager) -> Option<DetectedTool> {
     let path = which(name).ok()?;
 
     // Resolve symlinks to get real path
     let resolved = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
 
     // Package manager CLIs map directly to their manager regardless of installation path.
-    let manager = match name {
-        // System package managers
-        "brew" => Manager::Brew,
-        "port" => Manager::Port,
-        "mas" => Manager::Mas,
-        "softwareupdate" => Manager::SoftwareUpdate,
-        // Version managers (with global upgrade support)
-        "mise" => Manager::Mise,
-        "conda" => Manager::Conda,
-        // Node.js package managers
-        "npm" => Manager::Npm,
-        "pnpm" => Manager::Pnpm,
-        // Python package managers
-        "pipx" => Manager::Pipx,
-        // Ruby package managers
-        "gem" => Manager::Gem,
-        // Rust tools
-        "rustup" => Manager::Rustup,
-        "cargo" => Manager::Cargo,
-        // Windows package managers
-        "choco" => Manager::Choco,
-        "winget" => Manager::Winget,
-        "scoop" => Manager::Scoop,
-        // Unknown tools - try path-based detection
-        _ => detect_manager(&resolved),
+    let resolved_manager = if manager == Manager::Unknown {
+        detect_manager(&resolved)
+    } else {
+        manager
     };
 
     Some(DetectedTool {
-        name: name.to_string(),
         path: resolved,
-        manager,
+        manager: resolved_manager,
     })
 }
 

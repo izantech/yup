@@ -137,21 +137,11 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
     // Check for privileged actions (Unix only)
     #[cfg(unix)]
     let needs_sudo = actions.iter().any(|a| a.requires_privilege);
+    #[cfg(not(unix))]
+    let needs_sudo = false;
 
     // Refresh sudo credentials if needed (Unix only)
-    #[cfg(unix)]
-    if needs_sudo {
-        if !sudo::is_sudo_available() {
-            anyhow::bail!("Sudo is required but not available on this system");
-        }
-        if !sudo::has_valid_credentials().await {
-            println!("Refreshing sudo credentials...");
-            if !sudo::refresh_credentials().await? {
-                anyhow::bail!("Failed to obtain sudo credentials");
-            }
-            println!();
-        }
-    }
+    ensure_sudo_credentials(needs_sudo).await?;
 
     println!("Checking for outdated packages...\n");
 
@@ -168,7 +158,7 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
         #[cfg(not(unix))]
         let cmd = action.command.clone();
 
-        match execute_command(&cmd).await {
+        match execute_command(&cmd, OutputMode::Stream).await {
             Ok(_) => {}
             Err(e) => {
                 println!("  Error: {}\n", e);
@@ -262,21 +252,7 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
     println!();
 
     // Refresh sudo credentials if needed (Unix only)
-    #[cfg(unix)]
-    if needs_sudo {
-        if !sudo::is_sudo_available() {
-            anyhow::bail!("Sudo is required but not available on this system");
-        }
-
-        // Check if we already have valid credentials
-        if !sudo::has_valid_credentials().await {
-            println!("Refreshing sudo credentials...");
-            if !sudo::refresh_credentials().await? {
-                anyhow::bail!("Failed to obtain sudo credentials");
-            }
-            println!();
-        }
-    }
+    ensure_sudo_credentials(needs_sudo).await?;
 
     let total = actions.len();
     let mut success_count = 0;
@@ -309,7 +285,14 @@ async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::R
         progress.set_message(format!("{} - {}", action.command, action.description));
 
         // Execute command with progress integration
-        let result = execute_command_with_progress(&cmd_to_run, args.verbose, &progress).await;
+        let result = execute_command(
+            &cmd_to_run,
+            OutputMode::Progress {
+                progress: &progress,
+                verbose: args.verbose,
+            },
+        )
+        .await;
 
         let elapsed = start.elapsed();
 
@@ -386,42 +369,19 @@ fn create_shell_command(cmd_str: &str) -> ProcessCommand {
     }
 }
 
-/// Execute a shell command and stream output (used for status checks)
-async fn execute_command(cmd_str: &str) -> anyhow::Result<bool> {
-    let mut cmd = create_shell_command(cmd_str);
-    cmd.stdout(Stdio::piped());
-    cmd.stderr(Stdio::piped());
-
-    let mut child = cmd.spawn()?;
-
-    // Stream stdout
-    if let Some(stdout) = child.stdout.take() {
-        let mut reader = BufReader::new(stdout).lines();
-        while let Some(line) = reader.next_line().await? {
-            println!("      {}", line);
-        }
-    }
-
-    // Stream stderr
-    if let Some(stderr) = child.stderr.take() {
-        let mut reader = BufReader::new(stderr).lines();
-        while let Some(line) = reader.next_line().await? {
-            println!("      [err] {}", line);
-        }
-    }
-
-    let status = child.wait().await?;
-    Ok(status.success())
+enum OutputMode<'a> {
+    Stream,
+    Progress {
+        progress: &'a ProgressBar,
+        verbose: bool,
+    },
 }
 
-/// Execute a shell command with progress bar integration
-/// - In verbose mode: streams stdout/stderr above the progress bar
-/// - In non-verbose mode: captures stderr and only shows it on failure
-async fn execute_command_with_progress(
-    cmd_str: &str,
-    verbose: bool,
-    progress: &ProgressBar,
-) -> anyhow::Result<bool> {
+/// Execute a shell command with optional progress bar integration.
+/// - Stream: always prints stdout/stderr as they arrive.
+/// - Progress: in verbose mode streams output above the progress bar;
+///   otherwise captures stderr and only shows it on failure.
+async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<bool> {
     let mut cmd = create_shell_command(cmd_str);
     cmd.stdout(Stdio::piped());
     cmd.stderr(Stdio::piped());
@@ -433,8 +393,15 @@ async fn execute_command_with_progress(
     if let Some(stdout) = child.stdout.take() {
         let mut reader = BufReader::new(stdout).lines();
         while let Some(line) = reader.next_line().await? {
-            if verbose {
-                progress.suspend(|| println!("      {}", line));
+            match mode {
+                OutputMode::Stream => {
+                    println!("      {}", line);
+                }
+                OutputMode::Progress { progress, verbose } => {
+                    if verbose {
+                        progress.suspend(|| println!("      {}", line));
+                    }
+                }
             }
         }
     }
@@ -443,9 +410,16 @@ async fn execute_command_with_progress(
     if let Some(stderr) = child.stderr.take() {
         let mut reader = BufReader::new(stderr).lines();
         while let Some(line) = reader.next_line().await? {
-            stderr_output.push(line.clone());
-            if verbose {
-                progress.suspend(|| println!("      [err] {}", line));
+            match mode {
+                OutputMode::Stream => {
+                    println!("      [err] {}", line);
+                }
+                OutputMode::Progress { progress, verbose } => {
+                    stderr_output.push(line.clone());
+                    if verbose {
+                        progress.suspend(|| println!("      [err] {}", line));
+                    }
+                }
             }
         }
     }
@@ -453,15 +427,43 @@ async fn execute_command_with_progress(
     let status = child.wait().await?;
 
     // If command failed and not verbose, print stderr for debugging
-    if !status.success() && !verbose && !stderr_output.is_empty() {
-        progress.suspend(|| {
-            for line in &stderr_output {
-                println!("      [err] {}", line);
-            }
-        });
+    if let OutputMode::Progress { progress, verbose } = mode {
+        if !status.success() && !verbose && !stderr_output.is_empty() {
+            progress.suspend(|| {
+                for line in &stderr_output {
+                    println!("      [err] {}", line);
+                }
+            });
+        }
     }
 
     Ok(status.success())
+}
+
+#[cfg(unix)]
+async fn ensure_sudo_credentials(needs_sudo: bool) -> anyhow::Result<()> {
+    if !needs_sudo {
+        return Ok(());
+    }
+
+    if !sudo::is_sudo_available() {
+        anyhow::bail!("Sudo is required but not available on this system");
+    }
+
+    if !sudo::has_valid_credentials().await {
+        println!("Refreshing sudo credentials...");
+        if !sudo::refresh_credentials().await? {
+            anyhow::bail!("Failed to obtain sudo credentials");
+        }
+        println!();
+    }
+
+    Ok(())
+}
+
+#[cfg(not(unix))]
+async fn ensure_sudo_credentials(_needs_sudo: bool) -> anyhow::Result<()> {
+    Ok(())
 }
 
 fn show_last_log() -> anyhow::Result<()> {

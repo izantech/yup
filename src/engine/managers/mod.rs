@@ -3,27 +3,23 @@
 //! This module defines the `PackageManager` trait and implementations for
 //! various system package managers.
 
-use super::types::{Action, ActionKind, Manager};
+use super::types::{Action, Manager};
 
-/// Trait for package manager implementations
-#[allow(dead_code)] // Methods kept for future display/privilege features
+/// Trait defining the interface for package manager implementations.
 pub trait PackageManager {
-    /// Human-readable name for display
-    fn name(&self) -> &'static str;
-
-    /// Get actions to update package metadata/index (e.g., brew update)
+    /// Returns a list of actions to update the package manager's metadata or index.
+    /// Example: `brew update` or `apt update`.
     fn update_actions(&self) -> Vec<Action>;
 
-    /// Get actions to upgrade installed packages (e.g., brew upgrade)
+    /// Returns a list of actions to upgrade the packages managed by this tool.
+    /// Example: `brew upgrade` or `npm update -g`.
     fn upgrade_actions(&self) -> Vec<Action>;
 
-    /// Get actions to check for outdated packages (e.g., brew outdated)
+    /// Returns a list of actions to check for outdated packages without performing an update.
+    /// Example: `brew outdated`.
     fn check_actions(&self) -> Vec<Action> {
-        vec![] // Default: no check action
+        vec![] // Default implementation returns no actions
     }
-
-    /// Whether this manager requires root/admin privileges
-    fn requires_privilege(&self) -> bool;
 }
 
 /// Check if a command exists in PATH

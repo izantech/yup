@@ -35,8 +35,8 @@ src/
 
 ```rust
 // src/engine/types.rs
-enum Manager { Brew, Npm, Asdf, Nvm, ... }  // All supported managers
-struct Action { manager, kind, command, description, requires_privilege }
+enum Manager { Brew, Npm, Cargo, ... }  // All supported managers
+struct Action { manager, command, description, requires_privilege }
 struct ScanReport { detected_tools, available_managers, actionable_managers }
 ```
 
@@ -45,11 +45,9 @@ struct ScanReport { detected_tools, available_managers, actionable_managers }
 ```rust
 // src/engine/managers/mod.rs
 pub trait PackageManager {
-    fn name(&self) -> &'static str;
     fn update_actions(&self) -> Vec<Action>;      // Update package index
     fn upgrade_actions(&self) -> Vec<Action>;     // Upgrade packages
     fn check_actions(&self) -> Vec<Action>;       // Check for outdated (optional)
-    fn requires_privilege(&self) -> bool;
 }
 ```
 
@@ -66,44 +64,34 @@ pub enum Manager {
 }
 ```
 
-Update the `FromStr` implementation in the same file.
+Update the `FromStr` and `as_str`/`display_name` implementations in the same file.
 
 ### Step 2: Create Implementation
 
 Create `src/engine/managers/mymanager.rs`:
 
 ```rust
-use super::{Action, ActionKind, Manager, PackageManager};
+use super::{Action, Manager, PackageManager};
 
 pub struct MyManagerManager;
 
 impl PackageManager for MyManagerManager {
-    fn name(&self) -> &'static str {
-        "MyManager"
-    }
-
     fn update_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::MyManager,
-            kind: ActionKind::Update,
-            command: "mymanager refresh".to_string(),
-            description: "Refresh MyManager index".to_string(),
-            requires_privilege: false,  // Set true if needs sudo
-        }]
+        vec![Action::new(
+            Manager::MyManager,
+            "mymanager refresh",
+            "Refresh MyManager index",
+            false,  // Set true if needs sudo
+        )]
     }
 
     fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action {
-            manager: Manager::MyManager,
-            kind: ActionKind::Upgrade,
-            command: "mymanager upgrade --all".to_string(),
-            description: "Upgrade MyManager packages".to_string(),
-            requires_privilege: false,  // Set true if needs sudo
-        }]
-    }
-
-    fn requires_privilege(&self) -> bool {
-        false
+        vec![Action::new(
+            Manager::MyManager,
+            "mymanager upgrade --all",
+            "Upgrade MyManager packages",
+            false,
+        )]
     }
 }
 ```
