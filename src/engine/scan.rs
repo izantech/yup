@@ -10,9 +10,20 @@ pub fn scan() -> ScanReport {
         .filter(|manager| which(manager.as_ref().to_lowercase()).is_ok())
         .collect();
 
+    // Compute actionable managers (those with implementations AND actions)
+    let actionable_managers = Manager::iter()
+        .filter(|manager| which(manager.as_ref().to_lowercase()).is_ok())
+        .filter_map(|manager| {
+            let pkg_manager = create_manager(manager)?;
+            let has_actions = !pkg_manager.update_actions().is_empty()
+                || !pkg_manager.upgrade_actions().is_empty();
+            has_actions.then_some(manager)
+        })
+        .collect();
+
     ScanReport {
         available_managers,
-        actionable_managers: Default::default(),
+        actionable_managers,
     }
 }
 
