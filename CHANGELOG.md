@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-01-12
+
 ### Fixed
 
 - **CRITICAL**: Configuration wizard showing "No package managers with available actions detected" for first-time users
