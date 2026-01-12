@@ -32,7 +32,7 @@ pub fn filter_actions(
 
             // Filter by --only (whitelist)
             if let Some(ref only_list) = only_list {
-                let matches = only_list.iter().any(|o| manager_name == *o);
+                let matches = only_list.contains(&manager_name);
                 if !matches {
                     return false;
                 }
@@ -40,7 +40,7 @@ pub fn filter_actions(
 
             // Filter by --skip (blacklist)
             if let Some(ref skip_list) = skip_list {
-                let matches = skip_list.iter().any(|s| manager_name == *s);
+                let matches = skip_list.contains(&manager_name);
                 if matches {
                     return false;
                 }

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-01-12
+
 ### Added
 
 - Windows ARM64 builds (aarch64-pc-windows-msvc)
@@ -18,18 +20,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated Rust edition from 2021 to 2024
+- Streamlined engine architecture by consolidating manager detection logic
+- Reduced codebase complexity through removal of redundant traits and abstractions
 - Adopted `if let` chain syntax for cleaner conditional expressions
 - Removed 17 package managers that lack meaningful global upgrade support:
   - **Project-local managers**: yarn, poetry, bun, uv, pip, go
   - **Version managers without bulk upgrade**: fnm, nvm, asdf, pyenv, rbenv, volta, rvm, sdkman
   - **Niche managers**: helm, krew, composer
-- Simplified path detection logic for removed version managers
+- Simplified path detection logic by removing special-case handling for removed managers
 - Updated documentation to reflect focused manager support (20 managers)
 
 ### Fixed
 
 - Windows path detection for package managers (Chocolatey, Scoop)
 - Wrapped Unix-specific paths with conditional compilation to prevent dead code on Windows
+
+## [0.1.2] - 2026-01-12
+
+### Fixed
+
+- Chocolatey workflow checksum download from GitHub releases
+
+## [0.1.1] - 2026-01-12
+
+### Added
+
+- winget package distribution for Windows
+- Chocolatey package distribution for Windows
+- Windows path detection for package managers
+
+### Changed
+
+- Documented release process in CONTRIBUTING.md
 
 ## [0.1.0] - 2026-01-12
 

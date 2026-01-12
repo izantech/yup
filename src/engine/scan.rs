@@ -7,7 +7,7 @@ use super::types::{Action, Manager, ScanReport};
 /// Scan the system for installed tools and detect their managers.
 pub fn scan() -> ScanReport {
     let available_managers = Manager::iter()
-        .filter(|manager| which(&manager.as_ref().to_lowercase()).is_ok())
+        .filter(|manager| which(manager.as_ref().to_lowercase()).is_ok())
         .collect();
 
     ScanReport {

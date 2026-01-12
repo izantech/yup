@@ -28,7 +28,7 @@ For new package managers, include:
 
 ### Prerequisites
 
-- Rust 1.70+ (Edition 2021)
+- Rust 1.92.0+ (Edition 2024)
 - Target platform for testing
 - rustup (recommended; honors `rust-toolchain.toml`)
 
