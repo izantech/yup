@@ -1,6 +1,6 @@
 # yup
 
-Safe, cross-platform updater for development tools.
+Safe, cross-platform updater that upgrades packages across your installed managers.
 
 `yup` detects your installed package managers and updates them all with a single command. On first run, it shows an interactive configuration wizard to select which managers to update. Subsequent runs execute directly with saved preferences.
 

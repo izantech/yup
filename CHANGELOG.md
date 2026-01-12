@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated Rust edition from 2021 to 2024
+- Adopted `if let` chain syntax for cleaner conditional expressions
 - Removed 17 package managers that lack meaningful global upgrade support:
   - **Project-local managers**: yarn, poetry, bun, uv, pip, go
   - **Version managers without bulk upgrade**: fnm, nvm, asdf, pyenv, rbenv, volta, rvm, sdkman

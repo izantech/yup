@@ -398,11 +398,10 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
             while let Some(line) = reader.next_line().await? {
                 if stream {
                     println!("      {}", line);
-                } else if let Some(progress) = progress {
-                    if verbose {
+                } else if let Some(progress) = progress
+                    && verbose {
                         progress.suspend(|| println!("      {}", line));
                     }
-                }
             }
         }
         Ok::<(), anyhow::Error>(())
@@ -433,15 +432,14 @@ async fn execute_command(cmd_str: &str, mode: OutputMode<'_>) -> anyhow::Result<
     let status = child.wait().await?;
 
     // If command failed and not verbose, print stderr for debugging
-    if let OutputMode::Progress { progress, verbose } = mode {
-        if !status.success() && !verbose && !stderr_output.is_empty() {
+    if let OutputMode::Progress { progress, verbose } = mode
+        && !status.success() && !verbose && !stderr_output.is_empty() {
             progress.suspend(|| {
                 for line in &stderr_output {
                     println!("      [err] {}", line);
                 }
             });
         }
-    }
 
     Ok(status.success())
 }

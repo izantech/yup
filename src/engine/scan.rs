@@ -52,12 +52,11 @@ pub fn scan() -> ScanReport {
 
     // Compute actionable managers (those with implementations AND actions)
     for manager in &report.available_managers {
-        if let Some(pkg_manager) = create_manager(*manager) {
-            if !pkg_manager.update_actions().is_empty() || !pkg_manager.upgrade_actions().is_empty()
+        if let Some(pkg_manager) = create_manager(*manager)
+            && (!pkg_manager.update_actions().is_empty() || !pkg_manager.upgrade_actions().is_empty())
             {
                 report.actionable_managers.insert(*manager);
             }
-        }
     }
 
     report
