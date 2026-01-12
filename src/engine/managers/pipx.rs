@@ -22,10 +22,12 @@ impl PackageManager for PipxManager {
     }
 
     fn check_actions(&self) -> Vec<Action> {
+        // pipx doesn't have a direct 'outdated' command, but upgrade-all --dry-run
+        // effectively shows what would be updated.
         vec![Action::new(
             Manager::Pipx,
-            "pipx list --outdated",
-            "Check for outdated pipx packages",
+            "pipx upgrade-all --dry-run",
+            "Check for available updates for all pipx packages",
             false,
         )]
     }
