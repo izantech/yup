@@ -19,9 +19,19 @@ impl PackageManager for WingetManager {
         vec![Action {
             manager: Manager::Winget,
             kind: ActionKind::Upgrade,
-            command: "winget upgrade --all --accept-package-agreements --accept-source-agreements"
+            command: "winget upgrade --all --silent --disable-interactivity --accept-package-agreements --accept-source-agreements"
                 .to_string(),
             description: "Upgrade all packages".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Winget,
+            kind: ActionKind::Check,
+            command: "winget list --upgrade-available".to_string(),
+            description: "Check for available upgrades".to_string(),
             requires_privilege: false,
         }]
     }

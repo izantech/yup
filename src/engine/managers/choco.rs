@@ -25,6 +25,16 @@ impl PackageManager for ChocoManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Choco,
+            kind: ActionKind::Check,
+            command: "choco outdated".to_string(),
+            description: "Check for outdated packages".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         true // choco needs admin
     }

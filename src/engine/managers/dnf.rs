@@ -34,6 +34,16 @@ impl PackageManager for DnfManager {
         ]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Dnf,
+            kind: ActionKind::Check,
+            command: "dnf check-update".to_string(),
+            description: "Check for available updates".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         true
     }

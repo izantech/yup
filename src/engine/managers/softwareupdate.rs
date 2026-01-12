@@ -25,6 +25,16 @@ impl PackageManager for SoftwareUpdateManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::SoftwareUpdate,
+            kind: ActionKind::Check,
+            command: "softwareupdate -l".to_string(),
+            description: "Check for available macOS updates".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         true
     }

@@ -26,6 +26,16 @@ impl PackageManager for PipxManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Pipx,
+            kind: ActionKind::Check,
+            command: "pipx list --outdated".to_string(),
+            description: "Check for outdated pipx packages".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         false
     }

@@ -30,6 +30,16 @@ impl PackageManager for PortManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Port,
+            kind: ActionKind::Check,
+            command: "port outdated".to_string(),
+            description: "Check for outdated ports".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         true
     }

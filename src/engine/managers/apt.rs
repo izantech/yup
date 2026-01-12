@@ -39,6 +39,16 @@ impl PackageManager for AptManager {
         ]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Apt,
+            kind: ActionKind::Check,
+            command: "apt list --upgradable".to_string(),
+            description: "Check for upgradable packages".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         true
     }

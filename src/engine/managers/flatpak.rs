@@ -25,6 +25,16 @@ impl PackageManager for FlatpakManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Flatpak,
+            kind: ActionKind::Check,
+            command: "flatpak remote-ls --updates".to_string(),
+            description: "Check for available updates".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         false // flatpak runs as user by default
     }

@@ -31,6 +31,16 @@ impl PackageManager for CondaManager {
         }]
     }
 
+    fn check_actions(&self) -> Vec<Action> {
+        vec![Action {
+            manager: Manager::Conda,
+            kind: ActionKind::Check,
+            command: "conda list --outdated".to_string(),
+            description: "Check for outdated packages".to_string(),
+            requires_privilege: false,
+        }]
+    }
+
     fn requires_privilege(&self) -> bool {
         false
     }
