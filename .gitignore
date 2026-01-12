@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+\#*\#
+.#*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+
+# Added by cargo
+
+/target
+.serena/

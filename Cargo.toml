@@ -1,0 +1,34 @@
+[package]
+name = "yup"
+version = "0.1.0"
+edition = "2021"
+authors = ["izantech"]
+description = "Safe, cross-platform updater for development tools"
+license = "MIT"
+repository = "https://github.com/izantech/yup"
+keywords = ["cli", "update", "package-manager", "devtools"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+anyhow = "1.0.100"
+chrono = "0.4.42"
+clap = { version = "4.5.54", features = ["derive"] }
+dialoguer = "0.11"
+indicatif = { version = "0.17", features = ["tokio"] }
+directories = "6.0.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["rt", "macros", "sync", "time", "io-util", "process"] }
+toml = "0.8"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+tracing-appender = "0.2"
+which = "8.0.0"
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.1"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

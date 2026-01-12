@@ -1,0 +1,405 @@
+mod cli;
+mod config;
+mod engine;
+mod prompt;
+
+use std::io::{self, Write};
+use std::path::PathBuf;
+use std::process::Stdio;
+use std::time::{Duration, Instant};
+
+use clap::Parser;
+use cli::{Cli, Command};
+use config::Config;
+use directories::ProjectDirs;
+use engine::{filter_actions, get_actions_for_scan, get_check_actions_for_scan, scan};
+use indicatif::{ProgressBar, ProgressStyle};
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Command as ProcessCommand;
+use tracing_appender::rolling::{RollingFileAppender, Rotation};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+/// Set up file logging with daily rotation.
+/// Returns the log directory path on success.
+fn setup_file_logging() -> Option<PathBuf> {
+    let proj_dirs = ProjectDirs::from("", "", "yup")?;
+    let log_dir = proj_dirs.data_local_dir();
+
+    // Create log directory if it doesn't exist
+    std::fs::create_dir_all(log_dir).ok()?;
+
+    let file_appender = RollingFileAppender::builder()
+        .rotation(Rotation::DAILY)
+        .filename_prefix("yup")
+        .filename_suffix("log")
+        .build(log_dir)
+        .ok()?;
+
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_writer(file_appender)
+                .with_ansi(false),
+        )
+        .init();
+
+    Some(log_dir.to_path_buf())
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> anyhow::Result<()> {
+    // Set up file logging (silent failure is OK - logging is optional)
+    let _log_dir = setup_file_logging();
+
+    let args = Cli::parse();
+
+    match args.command {
+        Some(Command::Config) => {
+            // Force re-run wizard
+            run_wizard_flow(&args).await?;
+        }
+        Some(Command::Log) => {
+            show_last_log()?;
+        }
+        None => {
+            // Check for --status flag first
+            if args.status {
+                run_status(&args).await?;
+            } else if Config::exists() {
+                // Subsequent run: use saved config
+                run_with_config(&args).await?;
+            } else if args.yes {
+                // No config but -y flag: run with all detected managers
+                run_without_config(&args).await?;
+            } else {
+                // First run: show wizard
+                run_wizard_flow(&args).await?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn run_wizard_flow(args: &Cli) -> anyhow::Result<()> {
+    let report = scan::scan();
+    let (config, should_execute) = prompt::run_wizard(&report)?;
+
+    if should_execute {
+        config.save()?;
+        if let Some(path) = Config::path() {
+            println!("\nConfiguration saved to {}\n", path.display());
+        }
+
+        let actions = prompt::get_filtered_actions(&config, &report);
+        if !actions.is_empty() {
+            run_actions(&actions, args).await?;
+        }
+    } else {
+        println!("Configuration cancelled.");
+    }
+
+    Ok(())
+}
+
+/// Run with all detected managers (no config, -y flag)
+async fn run_without_config(args: &Cli) -> anyhow::Result<()> {
+    // Scan and use detected managers
+    let report = scan::scan();
+    let all_actions = get_actions_for_scan(&report);
+
+    // Apply CLI filters
+    let actions = filter_actions(all_actions, args.only.as_deref(), args.skip.as_deref());
+
+    if actions.is_empty() {
+        println!("No actions to run.");
+        return Ok(());
+    }
+
+    run_actions(&actions, args).await
+}
+
+/// Run status check - show outdated packages without updating
+async fn run_status(args: &Cli) -> anyhow::Result<()> {
+    let report = scan::scan();
+    let all_actions = get_check_actions_for_scan(&report);
+
+    // Apply CLI filters
+    let actions = filter_actions(all_actions, args.only.as_deref(), args.skip.as_deref());
+
+    if actions.is_empty() {
+        println!("No status checks available for detected managers.");
+        return Ok(());
+    }
+
+    println!("Checking for outdated packages...\n");
+
+    for action in &actions {
+        println!("[{}] {}", action.manager, action.description);
+        match execute_command(&action.command).await {
+            Ok(_) => {}
+            Err(e) => {
+                println!("  Error: {}\n", e);
+            }
+        }
+        println!();
+    }
+
+    Ok(())
+}
+
+async fn run_with_config(args: &Cli) -> anyhow::Result<()> {
+    let config = Config::load().unwrap_or_default();
+    let report = scan::scan();
+
+    // Build actions from config
+    let actions = prompt::get_filtered_actions(&config, &report);
+
+    // Apply CLI overrides using filter_actions
+    let actions = filter_actions(actions, args.only.as_deref(), args.skip.as_deref());
+
+    if actions.is_empty() {
+        println!("No actions to run with current configuration.");
+        println!("Use 'yup config' to reconfigure.");
+        return Ok(());
+    }
+
+    // Show summary
+    println!("Running {} action(s)...\n", actions.len());
+
+    run_actions(&actions, args).await
+}
+
+async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::Result<()> {
+    // Display planned actions
+    println!("Planned actions ({}):", actions.len());
+    for (i, action) in actions.iter().enumerate() {
+        println!(
+            "  {}. {}: {} - {}",
+            i + 1,
+            action.manager,
+            action.command,
+            action.description
+        );
+    }
+    println!();
+
+    // If dry-run, just show what would happen
+    if args.dry_run {
+        println!("[DRY RUN] Would execute the above actions.");
+        return Ok(());
+    }
+
+    // Prompt for confirmation unless --yes is set
+    if !args.yes {
+        print!("Proceed with execution? [Y/n] ");
+        io::stdout().flush()?;
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input)?;
+
+        if input.trim().eq_ignore_ascii_case("n") {
+            println!("Cancelled.");
+            return Ok(());
+        }
+    }
+
+    println!();
+
+    let total = actions.len();
+    let mut success_count = 0;
+    let mut failed_actions: Vec<(usize, String, String)> = Vec::new();
+
+    // Create progress bar
+    let progress = ProgressBar::new(total as u64);
+    progress.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{bar:25.cyan/dim}] {pos}/{len} {msg}")
+            .unwrap()
+            .progress_chars("=> "),
+    );
+    progress.enable_steady_tick(Duration::from_millis(100));
+
+    for (i, action) in actions.iter().enumerate() {
+        let start = Instant::now();
+
+        // Update progress bar message with current action
+        progress.set_message(format!("{} - {}", action.command, action.description));
+
+        // Execute command with progress integration
+        let result = execute_command_with_progress(&action.command, args.verbose, &progress).await;
+
+        let elapsed = start.elapsed();
+
+        match result {
+            Ok(true) => {
+                success_count += 1;
+                if args.verbose {
+                    progress.suspend(|| {
+                        println!("      -> Done ({:.1}s)", elapsed.as_secs_f64());
+                    });
+                }
+            }
+            Ok(false) => {
+                failed_actions.push((i + 1, action.command.clone(), "Command failed".to_string()));
+                if args.verbose {
+                    progress.suspend(|| {
+                        println!("      -> FAILED ({:.1}s)", elapsed.as_secs_f64());
+                    });
+                }
+            }
+            Err(e) => {
+                failed_actions.push((i + 1, action.command.clone(), e.to_string()));
+                if args.verbose {
+                    progress.suspend(|| {
+                        println!("      -> ERROR: {}", e);
+                    });
+                }
+            }
+        }
+
+        progress.inc(1);
+    }
+
+    // Finish progress bar
+    if success_count == total {
+        progress.finish_with_message("All actions completed successfully");
+    } else {
+        progress.finish_with_message(format!(
+            "{}/{} succeeded, {} failed",
+            success_count,
+            total,
+            total - success_count
+        ));
+    }
+
+    println!();
+    println!("Completed: {}/{} actions succeeded", success_count, total);
+
+    // Show failed actions summary
+    if !failed_actions.is_empty() {
+        println!("\nFailed actions:");
+        for (idx, cmd, err) in &failed_actions {
+            println!("  {}. {} - {}", idx, cmd, err);
+        }
+    }
+
+    Ok(())
+}
+
+/// Execute a shell command and stream output (used for status checks)
+async fn execute_command(cmd_str: &str) -> anyhow::Result<bool> {
+    let mut cmd = ProcessCommand::new("sh");
+    cmd.args(["-c", cmd_str]);
+    cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
+
+    let mut child = cmd.spawn()?;
+
+    // Stream stdout
+    if let Some(stdout) = child.stdout.take() {
+        let mut reader = BufReader::new(stdout).lines();
+        while let Some(line) = reader.next_line().await? {
+            println!("      {}", line);
+        }
+    }
+
+    // Stream stderr
+    if let Some(stderr) = child.stderr.take() {
+        let mut reader = BufReader::new(stderr).lines();
+        while let Some(line) = reader.next_line().await? {
+            println!("      [err] {}", line);
+        }
+    }
+
+    let status = child.wait().await?;
+    Ok(status.success())
+}
+
+/// Execute a shell command with progress bar integration
+/// - In verbose mode: streams stdout/stderr above the progress bar
+/// - In non-verbose mode: captures stderr and only shows it on failure
+async fn execute_command_with_progress(
+    cmd_str: &str,
+    verbose: bool,
+    progress: &ProgressBar,
+) -> anyhow::Result<bool> {
+    let mut cmd = ProcessCommand::new("sh");
+    cmd.args(["-c", cmd_str]);
+    cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
+
+    let mut child = cmd.spawn()?;
+    let mut stderr_output = Vec::new();
+
+    // Handle stdout
+    if let Some(stdout) = child.stdout.take() {
+        let mut reader = BufReader::new(stdout).lines();
+        while let Some(line) = reader.next_line().await? {
+            if verbose {
+                progress.suspend(|| println!("      {}", line));
+            }
+        }
+    }
+
+    // Handle stderr - always capture, only display if verbose or on error
+    if let Some(stderr) = child.stderr.take() {
+        let mut reader = BufReader::new(stderr).lines();
+        while let Some(line) = reader.next_line().await? {
+            stderr_output.push(line.clone());
+            if verbose {
+                progress.suspend(|| println!("      [err] {}", line));
+            }
+        }
+    }
+
+    let status = child.wait().await?;
+
+    // If command failed and not verbose, print stderr for debugging
+    if !status.success() && !verbose && !stderr_output.is_empty() {
+        progress.suspend(|| {
+            for line in &stderr_output {
+                println!("      [err] {}", line);
+            }
+        });
+    }
+
+    Ok(status.success())
+}
+
+fn show_last_log() -> anyhow::Result<()> {
+    let proj_dirs = ProjectDirs::from("", "", "yup")
+        .ok_or_else(|| anyhow::anyhow!("Cannot determine log directory"))?;
+    let log_dir = proj_dirs.data_local_dir();
+
+    // Find the most recent log file
+    let mut log_files: Vec<_> = std::fs::read_dir(log_dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| {
+            e.path()
+                .extension()
+                .map(|ext| ext == "log")
+                .unwrap_or(false)
+        })
+        .collect();
+
+    if log_files.is_empty() {
+        println!("No log files found in {}", log_dir.display());
+        return Ok(());
+    }
+
+    // Sort by modification time (most recent first)
+    log_files.sort_by(|a, b| {
+        let a_time = a.metadata().and_then(|m| m.modified()).ok();
+        let b_time = b.metadata().and_then(|m| m.modified()).ok();
+        b_time.cmp(&a_time)
+    });
+
+    let latest_log = &log_files[0];
+    println!("=== {} ===\n", latest_log.path().display());
+
+    let content = std::fs::read_to_string(latest_log.path())?;
+    println!("{}", content);
+
+    Ok(())
+}
