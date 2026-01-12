@@ -94,7 +94,8 @@ mod tests {
 
         // All actionable managers must have at least one action (update or upgrade)
         for manager in &report.actionable_managers {
-            let pkg_manager = create_manager(*manager).expect("actionable manager should have implementation");
+            let pkg_manager =
+                create_manager(*manager).expect("actionable manager should have implementation");
             let has_actions = !pkg_manager.update_actions().is_empty()
                 || !pkg_manager.upgrade_actions().is_empty();
 
@@ -118,8 +119,7 @@ mod tests {
             assert!(
                 in_path,
                 "Available manager {:?} binary '{}' must be in PATH",
-                manager,
-                binary_name
+                manager, binary_name
             );
         }
     }
@@ -147,14 +147,12 @@ mod tests {
         let report2 = scan();
 
         assert_eq!(
-            report.available_managers,
-            report2.available_managers,
+            report.available_managers, report2.available_managers,
             "Available managers should be consistent across scans"
         );
 
         assert_eq!(
-            report.actionable_managers,
-            report2.actionable_managers,
+            report.actionable_managers, report2.actionable_managers,
             "Actionable managers should be consistent across scans"
         );
     }
