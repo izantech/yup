@@ -7,9 +7,10 @@ This project is being migrated from Rust to Oxide syntax. The build uses `cargo 
 **Completed:**
 - Phase 1: Infrastructure (experimental/oxide branch)
 - Phase 2: Core types and engine modules
+- Phase 3: Manager implementations (20 managers converted)
 
 **In Progress:**
-- Phase 3: Manager implementations
+- Phase 4: Core business logic (scan.ox, filter.ox, config.ox, prompt.ox, sudo.ox)
 
 **Build Command:** `cargo oxide build`
 
@@ -29,7 +30,7 @@ src/
     ├── filter.rs     # Action filtering (--only/--skip) (pending migration)
     └── managers/
         ├── mod.ox    # PackageManager trait, create_manager() factory (MIGRATED)
-        └── *.rs      # Individual manager implementations (pending migration)
+        └── *.ox      # Individual manager implementations (MIGRATED - 20 files)
 ```
 
 ## Toolchain
