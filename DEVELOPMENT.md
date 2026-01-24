@@ -2,36 +2,48 @@
 
 ## Oxide Migration Status
 
-This project is being migrated from Rust to Oxide syntax. The build uses `cargo oxide` instead of `cargo`.
+This project has been migrated from Rust to a hybrid Rust/Oxide codebase. The build uses `cargo oxide` which transpiles `.ox` files to Rust and builds from `oxide-gen/`.
 
 **Completed:**
 - Phase 1: Infrastructure (experimental/oxide branch)
 - Phase 2: Core types and engine modules
-- Phase 3: Manager implementations (20 managers converted)
-
-**In Progress:**
-- Phase 4: Core business logic (scan.ox, filter.ox, config.ox, prompt.ox, sudo.ox)
+- Phase 3: Manager implementations (20 managers converted to Oxide)
+- Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox)
+- Phase 5: CLI & Main (kept in Rust for complex macro support)
 
 **Build Command:** `cargo oxide build`
 
 ## Project Structure
 
 ```
-src/
-├── main.rs           # Entry point, CLI flow, command execution (pending migration)
-├── cli.rs            # Clap CLI argument definitions (pending migration)
-├── config.rs         # Config loading/saving (TOML) (pending migration)
-├── prompt.rs         # Interactive wizard (dialoguer) (pending migration)
-├── sudo.rs           # Sudo credential management (Unix only) (pending migration)
+src/                          # Oxide source files
+├── prompt.ox                 # Interactive wizard (OXIDE)
+├── sudo.ox                   # Sudo credential management (OXIDE)
 └── engine/
-    ├── mod.ox        # Module exports (MIGRATED)
-    ├── types.ox      # Core types: Manager, Action, ScanReport (MIGRATED)
-    ├── scan.rs       # System scanning, tool detection (pending migration)
-    ├── filter.rs     # Action filtering (--only/--skip) (pending migration)
+    ├── scan.ox               # System scanning, tool detection (OXIDE)
     └── managers/
-        ├── mod.ox    # PackageManager trait, create_manager() factory (MIGRATED)
-        └── *.ox      # Individual manager implementations (MIGRATED - 20 files)
+        ├── mod.ox            # PackageManager trait, create_manager() (OXIDE)
+        └── *.ox              # 20 manager implementations (OXIDE)
+
+oxide-gen/                    # Generated/maintained Rust files
+└── src/
+    ├── main.rs               # Entry point, CLI flow (RUST - complex macros)
+    ├── cli.rs                # Clap CLI definitions (RUST - derive macros)
+    ├── config.rs             # Config loading/saving (RUST - complex types)
+    └── engine/
+        ├── mod.rs            # Engine module (RUST - maintained)
+        ├── types.rs          # Core types (RUST - complex derives)
+        ├── filter.rs         # Action filtering (RUST - complex types)
+        └── ...               # Transpiled from *.ox files
 ```
+
+### Files Kept in Rust
+
+Some files are kept in Rust due to Oxide transpiler limitations:
+- **main.rs, cli.rs**: Complex macro attributes (`#[tokio::main]`, clap derives)
+- **types.rs**: Complex derive macros (strum, serde), public struct fields
+- **filter.rs**: Complex generic types (`Option<&[String]>`)
+- **config.rs**: Closure syntax for `ok_or_else`
 
 ## Toolchain
 
@@ -44,38 +56,35 @@ The repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
 
 1. **CLI parsing** (`cli.rs`): Parse arguments with clap
 2. **Mode dispatch** (`main.rs`): Route to wizard, config-based run, or status check
-3. **System scan** (`scan.rs`): Detect installed tools via `which`
-4. **Provenance detection** (`detect.rs`): Determine which manager installed each tool
-5. **Action generation** (`managers/*.rs`): Create update/upgrade/check actions
-6. **Execution** (`main.rs`): Run actions with progress bar
+3. **System scan** (`scan.ox`): Detect installed tools via `which`
+4. **Action generation** (`managers/*.ox`): Create update/upgrade/check actions
+5. **Execution** (`main.rs`): Run actions with progress bar
 
 ### Key Types
 
 ```rust
-// src/engine/types.rs
+// oxide-gen/src/engine/types.rs
 enum Manager { Brew, Npm, Cargo, ... }  // All supported managers
 struct Action { manager, command, description, requires_privilege }
-struct ScanReport { detected_tools, available_managers, actionable_managers }
+struct ScanReport { available_managers, actionable_managers }
 ```
 
 ### The PackageManager Trait
 
-```rust
-// src/engine/managers/mod.rs
-pub trait PackageManager {
-    fn update_actions(&self) -> Vec<Action>;      // Update package index
-    fn upgrade_actions(&self) -> Vec<Action>;     // Upgrade packages
-    fn check_actions(&self) -> Vec<Action>;       // Check for outdated (optional; default impl)
+```oxide
+// src/engine/managers/mod.ox
+public trait PackageManager {
+    fn update_actions(): Vec<Action>      // Update package index
+    fn upgrade_actions(): Vec<Action>     // Upgrade packages
+    fn check_actions(): Vec<Action>       // Check for outdated (optional)
 }
 ```
-
-Note: `check_actions()` has a default implementation; managers can override it.
 
 ## Adding a New Package Manager
 
 ### Step 1: Add Manager Variant
 
-In `src/engine/types.rs`, add to the `Manager` enum:
+In `oxide-gen/src/engine/types.rs`, add to the `Manager` enum:
 
 ```rust
 pub enum Manager {
@@ -83,8 +92,6 @@ pub enum Manager {
     MyManager,
 }
 ```
-
-Update the `FromStr` and `as_str`/`display_name` implementations in the same file.
 
 ### Step 2: Create Implementation
 
@@ -135,7 +142,7 @@ external module mymanager
 public import mymanager.MyManagerManager
 
 // Add case in create_manager()
-public fn create_manager(manager: Manager): Box<dyn PackageManager>? {
+public fn create_manager(manager: &Manager): Box<dyn PackageManager>? {
     match manager {
         // ... existing cases
         Manager.MyManager -> Some(Box.new(MyManagerManager) as Box<dyn PackageManager>)
@@ -143,21 +150,9 @@ public fn create_manager(manager: Manager): Box<dyn PackageManager>? {
 }
 ```
 
-### Step 4: Add to Scanner
-
-In `src/engine/scan.rs`, add to the `TOOLS` array if auto-detection is needed:
-
-```rust
-const TOOLS: &[&str] = &[
-    // ... existing tools
-    "mymanager",
-];
-```
-
-### Step 5: Update Documentation
+### Step 4: Update Documentation
 
 - `README.md`: Add to supported managers list
-- `INTERNALS.md`: Document the commands used
 - `CHANGELOG.md`: Note the addition
 
 ## Platform Support
@@ -165,9 +160,6 @@ const TOOLS: &[&str] = &[
 **Note:** Due to current Oxide codegen limitations, platform-specific `@[cfg(...)]`
 attributes on modules and imports are not fully supported. All managers are compiled
 on all platforms, and runtime detection (via `which`) handles availability.
-
-All managers are compiled cross-platform. The `scan.rs` file uses `which` to detect
-which managers are actually installed and available on the current system.
 
 ## Testing
 
@@ -222,3 +214,20 @@ git push origin v0.1.0
 | `directories` | Platform-appropriate config paths |
 | `serde` / `toml` | Config serialization |
 | `tracing` | Structured logging |
+| `oxide-stdlib` | Oxide standard library |
+
+## Oxide Syntax Quick Reference
+
+| Rust | Oxide |
+|------|-------|
+| `let mut x = 0;` | `var x = 0` |
+| `fn foo() -> T` | `fn foo(): T` |
+| `pub fn` | `public fn` |
+| `#[derive(...)]` | `@[derive(...)]` |
+| `impl Trait for T` | `extension T: Trait` |
+| `match x { _ => }` | `match x { else -> }` |
+| `\|x\| expr` | `{ x -> expr }` |
+| `use crate::mod` | `import crate.mod` |
+| `mod foo;` | `external module foo` |
+| `Some(x).await` | `await Some(x)` |
+| `format!("{}", x)` | `"$x"` |

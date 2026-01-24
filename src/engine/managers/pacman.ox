@@ -1,6 +1,7 @@
 //! Pacman package manager (Arch Linux)
 
 import super.{Action, Manager, PackageManager}
+import which.which
 
 /// Pacman package manager
 public struct PacmanManager
@@ -21,7 +22,7 @@ extension PacmanManager: PackageManager {
     }
 
     fn check_actions(): Vec<Action> {
-        if which.which("checkupdates").is_ok() {
+        if which("checkupdates").is_ok() {
             vec![Action.new(
                 Manager.Pacman,
                 "checkupdates",
