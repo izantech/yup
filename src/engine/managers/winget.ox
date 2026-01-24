@@ -11,9 +11,23 @@ extension WingetManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action(manager: Manager.winget, command: "winget upgrade --all --silent --disable-interactivity --accept-package-agreements --accept-source-agreements", description: "Upgrade all packages", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.winget,
+        command: "winget upgrade --all --silent --disable-interactivity --accept-package-agreements --accept-source-agreements",
+        description: "Upgrade all packages",
+        requiresPrivilege: false,
+      ),
+    ]
   }
   fn checkActions(): [Action] {
-    [Action(manager: Manager.winget, command: "winget list --upgrade-available", description: "Check for available upgrades", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.winget,
+        command: "winget list --upgrade-available",
+        description: "Check for available upgrades",
+        requiresPrivilege: false,
+      ),
+    ]
   }
 }

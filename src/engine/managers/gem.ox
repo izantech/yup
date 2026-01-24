@@ -7,12 +7,33 @@ public struct GemManager
 
 extension GemManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action(manager: Manager.gem, command: "gem update --system", description: "Update RubyGems itself", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.gem,
+        command: "gem update --system",
+        description: "Update RubyGems itself",
+        requiresPrivilege: false,
+      ),
+    ]
   }
   fn upgradeActions(): [Action] {
-    [Action(manager: Manager.gem, command: "gem update", description: "Update all installed gems", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.gem,
+        command: "gem update",
+        description: "Update all installed gems",
+        requiresPrivilege: false,
+      ),
+    ]
   }
   fn checkActions(): [Action] {
-    [Action(manager: Manager.gem, command: "gem outdated", description: "Check for outdated Ruby gems", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.gem,
+        command: "gem outdated",
+        description: "Check for outdated Ruby gems",
+        requiresPrivilege: false,
+      ),
+    ]
   }
 }

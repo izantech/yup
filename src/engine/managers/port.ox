@@ -7,12 +7,33 @@ public struct PortManager
 
 extension PortManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action(manager: Manager.port, command: "port selfupdate", description: "Update MacPorts and port definitions", requiresPrivilege: true)]
+    [
+      Action(
+        manager: Manager.port,
+        command: "port selfupdate",
+        description: "Update MacPorts and port definitions",
+        requiresPrivilege: true,
+      ),
+    ]
   }
   fn upgradeActions(): [Action] {
-    [Action(manager: Manager.port, command: "port upgrade outdated", description: "Upgrade outdated ports", requiresPrivilege: true)]
+    [
+      Action(
+        manager: Manager.port,
+        command: "port upgrade outdated",
+        description: "Upgrade outdated ports",
+        requiresPrivilege: true,
+      ),
+    ]
   }
   fn checkActions(): [Action] {
-    [Action(manager: Manager.port, command: "port outdated", description: "Check for outdated ports", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.port,
+        command: "port outdated",
+        description: "Check for outdated ports",
+        requiresPrivilege: false,
+      ),
+    ]
   }
 }

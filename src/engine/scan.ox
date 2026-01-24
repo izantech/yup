@@ -7,18 +7,17 @@ import super.types.{ Action, Manager, ScanReport }
 
 /// Scan the system for installed tools and detect their managers.
 public fn scan(): ScanReport {
-  let availableManagers = Manager.iter().filter {
-    which(it.asRef().toLowercase()).isOk()
-  }.collect()
+  let availableManagers = Manager.iter().filter { which(it.asRef().toLowercase()).isOk() }.collect()
 
   // Compute actionable managers (those with implementations AND actions)
-  let actionableManagers = Manager.iter().filter {
-    which(it.asRef().toLowercase()).isOk()
-  }.filterMap { manager ->
-    let pkgManager = createManager(manager)?
-    let hasActions = !pkgManager.updateActions().isEmpty() || !pkgManager.upgradeActions().isEmpty()
-    if hasActions { manager } else { null }
-  }.collect()
+  let actionableManagers = Manager.iter()
+    .filter { which(it.asRef().toLowercase()).isOk() }
+    .filterMap { manager ->
+      let pkgManager = createManager(manager)?
+      let hasActions = !pkgManager.updateActions().isEmpty() || !pkgManager.upgradeActions().isEmpty()
+      if hasActions { manager } else { null }
+    }
+    .collect()
 
   ScanReport(availableManagers: availableManagers, actionableManagers: actionableManagers)
 }
@@ -26,21 +25,23 @@ public fn scan(): ScanReport {
 /// Get actions for managers detected in the scan.
 /// Only returns actions for managers that were actually detected on the system.
 public fn getActionsForScan(report: ScanReport): [Action] {
-  report.availableManagers.iter().filterMap {
-    createManager(it)
-  }.flatMap { pkgManager ->
-    pkgManager.updateActions().intoIter().chain(pkgManager.upgradeActions())
-  }.collect()
+  report
+    .availableManagers
+    .iter()
+    .filterMap { createManager(it) }
+    .flatMap { pkgManager -> pkgManager.updateActions().intoIter().chain(pkgManager.upgradeActions()) }
+    .collect()
 }
 
 /// Get check actions for managers detected in the scan.
 /// Returns actions to check for outdated packages without updating.
 public fn getCheckActionsForScan(report: ScanReport): [Action] {
-  report.availableManagers.iter().filterMap {
-    createManager(it)
-  }.flatMap {
-    it.checkActions()
-  }.collect()
+  report
+    .availableManagers
+    .iter()
+    .filterMap { createManager(it) }
+    .flatMap { it.checkActions() }
+    .collect()
 }
 
 module tests {
@@ -118,7 +119,9 @@ module tests {
     // If we detect any package managers, at least some should be actionable.
     // Skip this assertion if no managers are available (e.g., in CI environments).
     if !report.availableManagers.isEmpty() {
-      assert!(!report.actionableManagers.isEmpty(), "When package managers are available, at least some should be actionable. Found {} available managers but 0 actionable managers.", report.availableManagers.len())
+      assert!(!report.actionableManagers.isEmpty(), "When package managers are available, at least some should be actionable. Found {} available managers but 0 actionable managers.", report
+        .availableManagers
+        .len())
     }
   }
 }

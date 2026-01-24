@@ -34,18 +34,20 @@ For new package managers, include:
 
 ### Building
 
+This project uses Oxide (transpiled to Rust):
+
 ```bash
 git clone https://github.com/izantech/yup
 cd yup
-cargo build
-cargo run -- --help
+cargo oxide build
+cargo oxide run -- --help
 ```
 
 ### Testing
 
 ```bash
-cargo test
-cargo run -- --dry-run  # Preview actions without executing
+cargo oxide test
+cargo oxide run -- --dry-run  # Preview actions without executing
 ```
 
 ## Code Style
@@ -54,15 +56,17 @@ cargo run -- --dry-run  # Preview actions without executing
 
 Before committing:
 ```bash
-cargo fmt
-cargo clippy
+cargo oxide fmt
+cargo oxide clippy
 ```
 
 ### Conventions
 
+- Source code is written in Oxide (`.ox` files), transpiled to Rust
+- Two files remain in Rust: `main.rs` and `cli.rs` (complex macro support)
 - Use `anyhow::Result` for error handling
 - Use `tracing` macros for logging (`debug!`, `info!`)
-- Platform-specific code uses `#[cfg(target_os = "...")]`
+- Platform-specific code uses `@[cfg(target_os = "...")]` in Oxide
 
 ## Pull Request Process
 

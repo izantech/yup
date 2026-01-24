@@ -13,9 +13,7 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
 
   // Get actionable managers sorted (only those with actual update/upgrade actions)
   var managers: [Manager] = report.actionableManagers.iter().copied().collect()
-  managers.sortByKey {
-    "$it"
-  }
+  managers.sortByKey { "$it" }
 
   if managers.isEmpty() {
     println!("No package managers with available actions detected on this system.")
@@ -26,23 +24,21 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   println!("Detected {} package managers:\n", managers.len())
 
   // Multi-select for managers
-  let managerNames: [String] = managers.iter().map {
-    "$it"
-  }.collect()
-  let defaults: [bool] = managers.iter().map {
-    true
-  }.collect()
+  let managerNames: [String] = managers.iter().map { "$it" }.collect()
+  let defaults: [bool] = managers.iter().map { true }.collect()
 
-  let selections = MultiSelect.with_theme(ColorfulTheme.default()).with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)").items(managerNames).defaults(defaults).interact()?
+  let selections = MultiSelect.with_theme(ColorfulTheme.default())
+    .with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)")
+    .items(managerNames)
+    .defaults(defaults)
+    .interact()?
 
   if selections.isEmpty() {
     println!("No managers selected. Exiting.")
     return Ok((Config.default(), false))
   }
 
-  let enabledManagers: [Manager] = selections.iter().map {
-    managers[*it]
-  }.collect()
+  let enabledManagers: [Manager] = selections.iter().map { managers[*it] }.collect()
 
   // Build config
   let config = Config(enabledManagers: enabledManagers.clone())
@@ -63,9 +59,15 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
 
   // Confirm execution
   let shouldExecute = if actions.isEmpty() {
-    Confirm.with_theme(ColorfulTheme.default()).with_prompt("Save this configuration?").default(true).interact()?
+    Confirm.with_theme(ColorfulTheme.default())
+      .with_prompt("Save this configuration?")
+      .default(true)
+      .interact()?
   } else {
-    Confirm.with_theme(ColorfulTheme.default()).with_prompt("Save configuration and run these commands?").default(true).interact()?
+    Confirm.with_theme(ColorfulTheme.default())
+      .with_prompt("Save configuration and run these commands?")
+      .default(true)
+      .interact()?
   }
 
   Ok((config, shouldExecute))
@@ -76,7 +78,5 @@ public fn getFilteredActions(config: Config, report: ScanReport): [Action] {
   let allActions = getActionsForScan(report)
   let enabledSet: HashSet<Manager> = config.enabledManagerSet()
 
-  allActions.intoIter().filter {
-    enabledSet.contains(it.manager)
-  }.collect()
+  allActions.intoIter().filter { enabledSet.contains(it.manager) }.collect()
 }

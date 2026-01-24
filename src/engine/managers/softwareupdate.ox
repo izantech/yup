@@ -11,9 +11,23 @@ extension SoftwareUpdateManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action(manager: Manager.softwareupdate, command: "softwareupdate -ia", description: "Install all macOS updates (may require restart)", requiresPrivilege: true)]
+    [
+      Action(
+        manager: Manager.softwareupdate,
+        command: "softwareupdate -ia",
+        description: "Install all macOS updates (may require restart)",
+        requiresPrivilege: true,
+      ),
+    ]
   }
   fn checkActions(): [Action] {
-    [Action(manager: Manager.softwareupdate, command: "softwareupdate -l", description: "Check for available macOS updates", requiresPrivilege: false)]
+    [
+      Action(
+        manager: Manager.softwareupdate,
+        command: "softwareupdate -l",
+        description: "Check for available macOS updates",
+        requiresPrivilege: false,
+      ),
+    ]
   }
 }

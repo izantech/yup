@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Complete Oxide migration**: Source files converted from Rust to Oxide syntax
+  - 26 `.ox` files in `src/` (all managers, engine modules, config, prompt, sudo)
+  - Only `main.rs` and `cli.rs` remain in Rust (complex macro support)
+- Adopted idiomatic Oxide constructor syntax (replacing `.new()` calls)
+- Updated project structure documentation
+
 ## [0.1.4] - 2026-01-12
 
 ### Fixed

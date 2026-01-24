@@ -37,11 +37,7 @@ extension Config {
     Ok(())
   }
   /// Check if config file exists
-  public fn exists(): bool { Config.path().map {
-      it.exists()
-    }.unwrapOr(false) }
+  public fn exists(): bool { Config.path().map { it.exists() }.unwrapOr(false) }
   /// Get enabled managers as a HashSet
-  public consuming fn enabledManagerSet(): HashSet<Manager> {
-    self.enabledManagers.iter().copied().collect()
-  }
+  public consuming fn enabledManagerSet(): HashSet<Manager> { self.enabledManagers.iter().copied().collect() }
 }

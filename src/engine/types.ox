@@ -37,7 +37,12 @@ public struct Action(manager: Manager, command: String, description: String, req
 extension Action {
   /// Create a new action
   public fn new(manager: Manager, command: impl Into<String>, description: impl Into<String>, requiresPrivilege: bool): Action {
-    Action(manager: manager, command: command.into(), description: description.into(), requiresPrivilege: requiresPrivilege)
+    Action(
+      manager: manager,
+      command: command.into(),
+      description: description.into(),
+      requiresPrivilege: requiresPrivilege,
+    )
   }
 }
 

@@ -13,9 +13,7 @@ public async fn hasValidCredentials(): bool {
   // Use output() which captures all streams, avoiding keyword conflicts
   let result = await ProcessCommand("sudo").args(["-n", "true"]).output()
 
-  result.map {
-    it.status.success()
-  }.unwrapOr(false)
+  result.map { it.status.success() }.unwrapOr(false)
 }
 
 /// Refresh sudo credentials by prompting the user

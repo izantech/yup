@@ -2,53 +2,57 @@
 
 ## Oxide Migration Status
 
-This project has been migrated from Rust to a hybrid Rust/Oxide codebase. The build uses `cargo oxide` which transpiles `.ox` files to Rust and builds from `oxide-gen/`.
+This project has been fully migrated to a hybrid Rust/Oxide codebase. The Oxide transpiler converts `.ox` files to Rust in the `oxide-gen/` directory.
 
-**Completed:**
-- Phase 1: Infrastructure (experimental/oxide branch)
-- Phase 2: Core types and engine modules
-- Phase 3: Manager implementations (20 managers converted to Oxide)
-- Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox)
-- Phase 5: CLI & Main (kept in Rust for complex macro support)
+**Migration Complete:**
+- ✅ Phase 1: Infrastructure setup
+- ✅ Phase 2: Core types and engine modules
+- ✅ Phase 3: All 20 manager implementations converted to Oxide
+- ✅ Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox, config.ox, filter.ox)
+- ✅ Phase 5: CLI & Main kept in Rust (complex macro support)
+- ✅ Phase 6: Testing & Verification
 
 **Build Commands:**
-- `cd oxide-gen && cargo build` - Build directly (recommended)
-- `cd oxide-gen && cargo test` - Run tests
-- `cd oxide-gen && cargo run -- --dry-run` - Test the binary
+```bash
+cargo oxide build              # Transpile + debug build
+cargo oxide build --release    # Transpile + release build
+cargo oxide test               # Run tests
+cargo oxide run -- --dry-run   # Test the binary
+```
 
-**Note:** Due to the hybrid Rust/Oxide structure, build directly from `oxide-gen/` rather than using `cargo oxide build` from the root. The root `cargo oxide` command would regenerate oxide-gen and overwrite the manually-maintained Rust files.
+Source files (both `.ox` and `.rs`) live in `src/`. The Oxide transpiler generates `oxide-gen/` with the final Rust code.
 
 ## Project Structure
 
 ```
-src/                          # Oxide source files
+src/                          # Source files (Oxide + Rust)
+├── main.rs                   # Entry point, CLI flow (RUST - tokio/clap macros)
+├── cli.rs                    # Clap CLI definitions (RUST - derive macros)
+├── config.ox                 # Config loading/saving (OXIDE)
 ├── prompt.ox                 # Interactive wizard (OXIDE)
 ├── sudo.ox                   # Sudo credential management (OXIDE)
 └── engine/
+    ├── mod.ox                # Engine module exports (OXIDE)
+    ├── types.ox              # Core types: Manager, Action (OXIDE)
     ├── scan.ox               # System scanning, tool detection (OXIDE)
+    ├── filter.ox             # Action filtering for --only/--skip (OXIDE)
     └── managers/
         ├── mod.ox            # PackageManager trait, create_manager() (OXIDE)
         └── *.ox              # 20 manager implementations (OXIDE)
 
-oxide-gen/                    # Generated/maintained Rust files
+oxide-gen/                    # Generated output (do not edit)
 └── src/
-    ├── main.rs               # Entry point, CLI flow (RUST - complex macros)
-    ├── cli.rs                # Clap CLI definitions (RUST - derive macros)
-    ├── config.rs             # Config loading/saving (RUST - complex types)
-    └── engine/
-        ├── mod.rs            # Engine module (RUST - maintained)
-        ├── types.rs          # Core types (RUST - complex derives)
-        ├── filter.rs         # Action filtering (RUST - complex types)
-        └── ...               # Transpiled from *.ox files
+    ├── main.rs               # Copied from src/
+    ├── cli.rs                # Copied from src/
+    ├── oxide_helpers.rs      # Oxide runtime helpers
+    └── *.rs                  # Transpiled from *.ox files
 ```
 
 ### Files Kept in Rust
 
-Some files are kept in Rust due to Oxide transpiler limitations:
-- **main.rs, cli.rs**: Complex macro attributes (`#[tokio::main]`, clap derives)
-- **types.rs**: Complex derive macros (strum, serde), public struct fields
-- **filter.rs**: Complex generic types (`Option<&[String]>`)
-- **config.rs**: Closure syntax for `ok_or_else`
+Two files in `src/` remain in Rust due to Oxide transpiler limitations with complex macros:
+- **main.rs**: `#[tokio::main]` async runtime and clap derives
+- **cli.rs**: Clap command-line argument derives
 
 ## Toolchain
 
@@ -67,11 +71,11 @@ The repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
 
 ### Key Types
 
-```rust
-// oxide-gen/src/engine/types.rs
-enum Manager { Brew, Npm, Cargo, ... }  // All supported managers
-struct Action { manager, command, description, requires_privilege }
-struct ScanReport { available_managers, actionable_managers }
+```oxide
+// src/engine/types.ox
+public enum Manager { Brew, Npm, Cargo, ... }  // All supported managers
+public struct Action { manager, command, description, requires_privilege }
+public struct ScanReport { available_managers, actionable_managers }
 ```
 
 ### The PackageManager Trait
@@ -89,12 +93,12 @@ public trait PackageManager {
 
 ### Step 1: Add Manager Variant
 
-In `oxide-gen/src/engine/types.rs`, add to the `Manager` enum:
+In `src/engine/types.ox`, add to the `Manager` enum:
 
-```rust
-pub enum Manager {
+```oxide
+public enum Manager {
     // ... existing variants
-    MyManager,
+    MyManager
 }
 ```
 
@@ -112,21 +116,21 @@ public struct MyManagerManager
 
 extension MyManagerManager: PackageManager {
     fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.MyManager,
-            "mymanager refresh",
-            "Refresh MyManager index",
-            false
-        )]
+        vec![Action {
+            manager: Manager.MyManager,
+            command: "mymanager refresh",
+            description: "Refresh MyManager index",
+            requires_privilege: false
+        }]
     }
 
     fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.MyManager,
-            "mymanager upgrade --all",
-            "Upgrade MyManager packages",
-            false
-        )]
+        vec![Action {
+            manager: Manager.MyManager,
+            command: "mymanager upgrade --all",
+            description: "Upgrade MyManager packages",
+            requires_privilege: false
+        }]
     }
 
     fn check_actions(): Vec<Action> {
@@ -150,14 +154,22 @@ public import mymanager.MyManagerManager
 public fn create_manager(manager: &Manager): Box<dyn PackageManager>? {
     match manager {
         // ... existing cases
-        Manager.MyManager -> Some(Box.new(MyManagerManager) as Box<dyn PackageManager>)
+        Manager.MyManager -> Some(Box(MyManagerManager) as Box<dyn PackageManager>)
+        else -> None
     }
 }
 ```
 
-### Step 4: Update Documentation
+### Step 4: Build
+
+```bash
+cargo oxide build
+```
+
+### Step 5: Update Documentation
 
 - `README.md`: Add to supported managers list
+- `INTERNALS.md`: Document commands
 - `CHANGELOG.md`: Note the addition
 
 ## Platform Support
@@ -171,17 +183,16 @@ on all platforms, and runtime detection (via `which`) handles availability.
 ### Unit Tests
 
 ```bash
-cd oxide-gen && cargo test
+cargo oxide test
 ```
 
 ### Manual Testing
 
 ```bash
-cd oxide-gen
-cargo run -- --dry-run      # Preview actions without executing
-cargo run -- --status       # Check for outdated packages
-cargo run -- --verbose      # See command output
-cargo run -- --only brew    # Test specific manager
+cargo oxide run -- --dry-run      # Preview actions without executing
+cargo oxide run -- --status       # Check for outdated packages
+cargo oxide run -- --verbose      # See command output
+cargo oxide run -- --only brew    # Test specific manager
 ```
 
 ## Build & Release
@@ -189,7 +200,7 @@ cargo run -- --only brew    # Test specific manager
 ### Local Build
 
 ```bash
-cd oxide-gen && cargo build --release
+cargo oxide build --release
 ```
 
 ### Release Process
