@@ -7,15 +7,15 @@ public struct BrewManager
 
 extension BrewManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action.new(Manager.brew, "brew update", "Update Homebrew formulae", false)]
+    [Action(manager: Manager.brew, command: "brew update", description: "Update Homebrew formulae", requiresPrivilege: false)]
   }
   fn upgradeActions(): [Action] {
     [
-      Action.new(Manager.brew, "brew upgrade", "Upgrade outdated formulae", false),
-      Action.new(Manager.brew, "brew cleanup", "Remove old versions", false),
+      Action(manager: Manager.brew, command: "brew upgrade", description: "Upgrade outdated formulae", requiresPrivilege: false),
+      Action(manager: Manager.brew, command: "brew cleanup", description: "Remove old versions", requiresPrivilege: false),
     ]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.brew, "brew outdated", "Check for outdated formulae", false)]
+    [Action(manager: Manager.brew, command: "brew outdated", description: "Check for outdated formulae", requiresPrivilege: false)]
   }
 }

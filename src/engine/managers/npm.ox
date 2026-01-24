@@ -7,12 +7,12 @@ public struct NpmManager
 
 extension NpmManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action.new(Manager.npm, "npm install -g npm", "Update npm itself", false)]
+    [Action(manager: Manager.npm, command: "npm install -g npm", description: "Update npm itself", requiresPrivilege: false)]
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.npm, "npm update -g", "Update global npm packages", false)]
+    [Action(manager: Manager.npm, command: "npm update -g", description: "Update global npm packages", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.npm, "npm outdated -g", "Check for outdated global npm packages", false)]
+    [Action(manager: Manager.npm, command: "npm outdated -g", description: "Check for outdated global npm packages", requiresPrivilege: false)]
   }
 }

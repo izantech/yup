@@ -12,11 +12,11 @@ extension DnfManager: PackageManager {
   }
   fn upgradeActions(): [Action] {
     [
-      Action.new(Manager.dnf, "dnf upgrade -y", "Upgrade all packages", true),
-      Action.new(Manager.dnf, "dnf autoremove -y", "Remove unused dependencies", true),
+      Action(manager: Manager.dnf, command: "dnf upgrade -y", description: "Upgrade all packages", requiresPrivilege: true),
+      Action(manager: Manager.dnf, command: "dnf autoremove -y", description: "Remove unused dependencies", requiresPrivilege: true),
     ]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.dnf, "dnf check-update", "Check for available updates", false)]
+    [Action(manager: Manager.dnf, command: "dnf check-update", description: "Check for available updates", requiresPrivilege: false)]
   }
 }

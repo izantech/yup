@@ -12,7 +12,7 @@ extension PipxManager: PackageManager {
   }
   fn upgradeActions(): [Action] {
     // pipx upgrade-all is safe because each app is in its own isolated venv
-    [Action.new(Manager.pipx, "pipx upgrade-all", "Upgrade all pipx-installed packages", false)]
+    [Action(manager: Manager.pipx, command: "pipx upgrade-all", description: "Upgrade all pipx-installed packages", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
     // pipx doesn't provide a read-only "outdated" or dry-run upgrade command.

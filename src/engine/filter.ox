@@ -39,7 +39,7 @@ module tests {
   import super.*
   import crate.engine.types.Manager
   fn makeAction(manager: Manager): Action {
-    Action.new(manager, format!("{} update", manager), format!("Update {}", manager), false)
+    Action(manager: manager, command: format!("{} update", manager), description: format!("Update {}", manager), requiresPrivilege: false)
   }
   @[test]
   fn testFilterOnly() {

@@ -11,9 +11,9 @@ extension ChocoManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.choco, "choco upgrade all -y", "Upgrade all packages", true)]
+    [Action(manager: Manager.choco, command: "choco upgrade all -y", description: "Upgrade all packages", requiresPrivilege: true)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.choco, "choco outdated", "Check for outdated packages", false)]
+    [Action(manager: Manager.choco, command: "choco outdated", description: "Check for outdated packages", requiresPrivilege: false)]
   }
 }

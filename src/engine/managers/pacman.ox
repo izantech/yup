@@ -12,11 +12,11 @@ extension PacmanManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.pacman, "pacman -Syu --noconfirm", "Sync and upgrade all packages", true)]
+    [Action(manager: Manager.pacman, command: "pacman -Syu --noconfirm", description: "Sync and upgrade all packages", requiresPrivilege: true)]
   }
   fn checkActions(): [Action] {
     if which("checkupdates").isOk() {
-      [Action.new(Manager.pacman, "checkupdates", "Check for available updates", false)]
+      [Action(manager: Manager.pacman, command: "checkupdates", description: "Check for available updates", requiresPrivilege: false)]
     } else {
       []
     }

@@ -11,9 +11,9 @@ extension FlatpakManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.flatpak, "flatpak update -y", "Update all Flatpak applications", false)]
+    [Action(manager: Manager.flatpak, command: "flatpak update -y", description: "Update all Flatpak applications", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.flatpak, "flatpak remote-ls --updates", "Check for available updates", false)]
+    [Action(manager: Manager.flatpak, command: "flatpak remote-ls --updates", description: "Check for available updates", requiresPrivilege: false)]
   }
 }

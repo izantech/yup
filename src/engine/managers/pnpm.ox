@@ -7,12 +7,12 @@ public struct PnpmManager
 
 extension PnpmManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action.new(Manager.pnpm, "pnpm self-update", "Update pnpm itself", false)]
+    [Action(manager: Manager.pnpm, command: "pnpm self-update", description: "Update pnpm itself", requiresPrivilege: false)]
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.pnpm, "pnpm update -g", "Update global pnpm packages", false)]
+    [Action(manager: Manager.pnpm, command: "pnpm update -g", description: "Update global pnpm packages", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.pnpm, "pnpm outdated -g", "Check for outdated global pnpm packages", false)]
+    [Action(manager: Manager.pnpm, command: "pnpm outdated -g", description: "Check for outdated global pnpm packages", requiresPrivilege: false)]
   }
 }

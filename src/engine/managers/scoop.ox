@@ -7,12 +7,12 @@ public struct ScoopManager
 
 extension ScoopManager: PackageManager {
   fn updateActions(): [Action] {
-    [Action.new(Manager.scoop, "scoop update", "Update Scoop and manifests", false)]
+    [Action(manager: Manager.scoop, command: "scoop update", description: "Update Scoop and manifests", requiresPrivilege: false)]
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.scoop, "scoop update *", "Update all packages", false)]
+    [Action(manager: Manager.scoop, command: "scoop update *", description: "Update all packages", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.scoop, "scoop status", "Check for outdated packages", false)]
+    [Action(manager: Manager.scoop, command: "scoop status", description: "Check for outdated packages", requiresPrivilege: false)]
   }
 }

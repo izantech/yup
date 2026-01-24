@@ -11,9 +11,9 @@ extension SnapManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.snap, "snap refresh", "Refresh all Snap packages", true)]
+    [Action(manager: Manager.snap, command: "snap refresh", description: "Refresh all Snap packages", requiresPrivilege: true)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.snap, "snap refresh --list", "Check for available updates", false)]
+    [Action(manager: Manager.snap, command: "snap refresh --list", description: "Check for available updates", requiresPrivilege: false)]
   }
 }

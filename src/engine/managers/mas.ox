@@ -11,9 +11,9 @@ extension MasManager: PackageManager {
     []
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.mas, "mas upgrade", "Upgrade Mac App Store apps", true)]
+    [Action(manager: Manager.mas, command: "mas upgrade", description: "Upgrade Mac App Store apps", requiresPrivilege: true)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.mas, "mas outdated", "Check for outdated Mac App Store apps", false)]
+    [Action(manager: Manager.mas, command: "mas outdated", description: "Check for outdated Mac App Store apps", requiresPrivilege: false)]
   }
 }

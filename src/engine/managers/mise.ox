@@ -8,14 +8,14 @@ public struct MiseManager
 extension MiseManager: PackageManager {
   fn updateActions(): [Action] {
     [
-      Action.new(Manager.mise, "mise self-update", "Update mise itself", false),
-      Action.new(Manager.mise, "mise plugins update", "Update all mise plugins", false),
+      Action(manager: Manager.mise, command: "mise self-update", description: "Update mise itself", requiresPrivilege: false),
+      Action(manager: Manager.mise, command: "mise plugins update", description: "Update all mise plugins", requiresPrivilege: false),
     ]
   }
   fn upgradeActions(): [Action] {
-    [Action.new(Manager.mise, "mise upgrade", "Upgrade all mise-managed tools", false)]
+    [Action(manager: Manager.mise, command: "mise upgrade", description: "Upgrade all mise-managed tools", requiresPrivilege: false)]
   }
   fn checkActions(): [Action] {
-    [Action.new(Manager.mise, "mise outdated", "Check for outdated mise-managed tools", false)]
+    [Action(manager: Manager.mise, command: "mise outdated", description: "Check for outdated mise-managed tools", requiresPrivilege: false)]
   }
 }
