@@ -23,7 +23,7 @@ external module rustup
 external module brew
 external module mas
 external module port
-external module softwareUpdate
+external module softwareupdate
 
 // Linux managers
 external module apt
@@ -51,7 +51,7 @@ public import rustup.RustupManager
 public import brew.BrewManager
 public import mas.MasManager
 public import port.PortManager
-public import softwareUpdate.SoftwareUpdateManager
+public import softwareupdate.SoftwareUpdateManager
 public import apt.AptManager
 public import dnf.DnfManager
 public import flatpak.FlatpakManager

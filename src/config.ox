@@ -4,6 +4,7 @@ import std.collections.HashSet
 import std.path.PathBuf
 import directories.ProjectDirs
 import serde.{ Deserialize, Serialize }
+import anyhow.{ Result, anyhow }
 import crate.engine.Manager
 
 /// User configuration for yup
@@ -23,10 +24,10 @@ extension Config {
     toml.fromStr(content).ok()
   }
   /// Save config to disk
-  public fn save(consuming self: Self): anyhow.Result<()> {
+  public consuming fn save(): Result<()> {
     let path = match Config.path() {
       Some(p) -> p
-      null -> return Err(anyhow.anyhow!("Cannot determine config path"))
+      null -> return Err(anyhow!("Cannot determine config path"))
     }
     if let parent = path.parent() {
       std.fs.createDirAll(parent)?
@@ -40,7 +41,7 @@ extension Config {
       it.exists()
     }.unwrapOr(false) }
   /// Get enabled managers as a HashSet
-  public fn enabledManagerSet(consuming self: Self): HashSet<Manager> {
+  public consuming fn enabledManagerSet(): HashSet<Manager> {
     self.enabledManagers.iter().copied().collect()
   }
 }

@@ -1,6 +1,7 @@
 //! Sudo credential management for privileged commands
 
 import tokio.process.Command as ProcessCommand
+import anyhow.Result
 import which.which
 
 /// Check if sudo is available on this system
@@ -19,7 +20,7 @@ public async fn hasValidCredentials(): bool {
 
 /// Refresh sudo credentials by prompting the user
 /// Returns true if credentials were successfully obtained
-public async fn refreshCredentials(): anyhow.Result<bool> {
+public async fn refreshCredentials(): Result<bool> {
   let status = await ProcessCommand.new("sudo").arg("-v").status()
   let status = status?
 

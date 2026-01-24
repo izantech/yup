@@ -2,12 +2,13 @@
 
 import std.collections.HashSet
 import dialoguer.{ Confirm, MultiSelect, theme.ColorfulTheme }
+import anyhow.Result
 import crate.config.Config
 import crate.engine.{ Action, Manager, ScanReport, getActionsForScan }
 
 /// Run the configuration wizard
 /// Returns (Config, shouldExecute: bool)
-public fn runWizard(report: ScanReport): anyhow.Result<(Config, bool)> {
+public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   println!("\n=== yup - Development Tool Updater ===\n")
 
   // Get actionable managers sorted (only those with actual update/upgrade actions)
