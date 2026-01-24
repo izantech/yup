@@ -6,27 +6,27 @@ import super.{Action, Manager, PackageManager}
 public struct NpmManager
 
 extension NpmManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Npm,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.npm,
             "npm install -g npm",
             "Update npm itself",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Npm,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.npm,
             "npm update -g",
             "Update global npm packages",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Npm,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.npm,
             "npm outdated -g",
             "Check for outdated global npm packages",
             false

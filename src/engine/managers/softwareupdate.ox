@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct SoftwareUpdateManager
 
 extension SoftwareUpdateManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // softwareupdate list is automatic
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.SoftwareUpdate,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.softwareupdate,
             "softwareupdate -ia",
             "Install all macOS updates (may require restart)",
             true
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.SoftwareUpdate,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.softwareupdate,
             "softwareupdate -l",
             "Check for available macOS updates",
             false

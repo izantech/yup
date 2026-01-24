@@ -6,16 +6,16 @@ import super.{Action, Manager, PackageManager}
 public struct DnfManager
 
 extension DnfManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // DNF auto-syncs during upgrade, no separate update needed
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![
-            Action.new(Manager.Dnf, "dnf upgrade -y", "Upgrade all packages", true),
+    fn upgradeActions(): [Action] {
+        [
+            Action.new(Manager.dnf, "dnf upgrade -y", "Upgrade all packages", true),
             Action.new(
-                Manager.Dnf,
+                Manager.dnf,
                 "dnf autoremove -y",
                 "Remove unused dependencies",
                 true
@@ -23,9 +23,9 @@ extension DnfManager: PackageManager {
         ]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Dnf,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.dnf,
             "dnf check-update",
             "Check for available updates",
             false

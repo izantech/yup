@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct MasManager
 
 extension MasManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // mas has no separate update step
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Mas,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.mas,
             "mas upgrade",
             "Upgrade Mac App Store apps",
             true
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Mas,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.mas,
             "mas outdated",
             "Check for outdated Mac App Store apps",
             false

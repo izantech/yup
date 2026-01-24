@@ -3,56 +3,56 @@
 import strum.IntoEnumIterator
 import which.which
 
-import super.managers.create_manager
+import super.managers.createManager
 import super.types.{Action, Manager, ScanReport}
 
 /// Scan the system for installed tools and detect their managers.
 public fn scan(): ScanReport {
-    let available_managers = Manager.iter()
-        .filter({ manager -> which(manager.as_ref().to_lowercase()).is_ok() })
+    let availableManagers = Manager.iter()
+        .filter { which(it.as_ref().to_lowercase()).is_ok() }
         .collect()
 
     // Compute actionable managers (those with implementations AND actions)
-    let actionable_managers = Manager.iter()
-        .filter({ manager -> which(manager.as_ref().to_lowercase()).is_ok() })
-        .filter_map({ manager ->
-            let pkg_manager = create_manager(&manager)?
-            let has_actions = !pkg_manager.update_actions().is_empty()
-                || !pkg_manager.upgrade_actions().is_empty()
-            has_actions.then_some(manager)
-        })
+    let actionableManagers = Manager.iter()
+        .filter { which(it.as_ref().to_lowercase()).is_ok() }
+        .filter_map { manager ->
+            let pkgManager = createManager(manager)?
+            let hasActions = !pkgManager.updateActions().is_empty()
+                || !pkgManager.upgradeActions().is_empty()
+            hasActions.then_some(manager)
+        }
         .collect()
 
     ScanReport(
-        available_managers: available_managers,
-        actionable_managers: actionable_managers
+        availableManagers: availableManagers,
+        actionableManagers: actionableManagers
     )
 }
 
 /// Get actions for managers detected in the scan.
 /// Only returns actions for managers that were actually detected on the system.
-public fn get_actions_for_scan(report: &ScanReport): Vec<Action> {
+public fn getActionsForScan(report: ScanReport): [Action] {
     report
-        .available_managers
+        .availableManagers
         .iter()
-        .filter_map({ manager -> create_manager(manager) })
-        .flat_map({ pkg_manager ->
-            pkg_manager
-                .update_actions()
+        .filter_map { createManager(it) }
+        .flat_map { pkgManager ->
+            pkgManager
+                .updateActions()
                 .into_iter()
-                .chain(pkg_manager.upgrade_actions())
-        })
+                .chain(pkgManager.upgradeActions())
+        }
         .collect()
 }
 
 /// Get check actions for managers detected in the scan.
 /// Returns actions to check for outdated packages without updating.
-public fn get_check_actions_for_scan(report: &ScanReport): Vec<Action> {
+public fn getCheckActionsForScan(report: ScanReport): [Action] {
     report
-        .available_managers
+        .availableManagers
         .iter()
-        .filter_map({ manager -> create_manager(manager) })
-        .flat_map({ pkg_manager -> pkg_manager.check_actions() })
+        .filter_map { createManager(it) }
+        .flat_map { it.checkActions() }
         .collect()
 }
 
@@ -61,28 +61,28 @@ module tests {
     import super.*
 
     @[test]
-    fn test_scan_actionable_managers_subset_of_available() {
+    fn testScanActionableManagersSubsetOfAvailable() {
         let report = scan()
 
-        // CRITICAL REGRESSION TEST: actionable_managers must be a subset of available_managers
-        for manager in &report.actionable_managers {
+        // CRITICAL REGRESSION TEST: actionableManagers must be a subset of availableManagers
+        for manager in report.actionableManagers {
             assert!(
-                report.available_managers.contains(manager),
-                "Actionable manager {} must be in available_managers",
+                report.availableManagers.contains(manager),
+                "Actionable manager {} must be in availableManagers",
                 manager
             )
         }
     }
 
     @[test]
-    fn test_scan_actionable_managers_have_implementations() {
+    fn testScanActionableManagersHaveImplementations() {
         let report = scan()
 
-        // All actionable managers must have implementations (create_manager returns Some)
-        for manager in &report.actionable_managers {
-            let pkg_manager = create_manager(manager)
+        // All actionable managers must have implementations (createManager returns Some)
+        for manager in report.actionableManagers {
+            let pkgManager = createManager(manager)
             assert!(
-                pkg_manager.is_some(),
+                pkgManager.is_some(),
                 "Actionable manager {} must have an implementation",
                 manager
             )
@@ -90,18 +90,18 @@ module tests {
     }
 
     @[test]
-    fn test_scan_actionable_managers_have_actions() {
+    fn testScanActionableManagersHaveActions() {
         let report = scan()
 
         // All actionable managers must have at least one action (update or upgrade)
-        for manager in &report.actionable_managers {
-            let pkg_manager =
-                create_manager(manager).expect("actionable manager should have implementation")
-            let has_actions = !pkg_manager.update_actions().is_empty()
-                || !pkg_manager.upgrade_actions().is_empty()
+        for manager in report.actionableManagers {
+            let pkgManager =
+                createManager(manager).expect("actionable manager should have implementation")
+            let hasActions = !pkgManager.updateActions().is_empty()
+                || !pkgManager.upgradeActions().is_empty()
 
             assert!(
-                has_actions,
+                hasActions,
                 "Actionable manager {} must have at least one action",
                 manager
             )
@@ -109,68 +109,68 @@ module tests {
     }
 
     @[test]
-    fn test_scan_available_managers_are_in_path() {
+    fn testScanAvailableManagersAreInPath() {
         let report = scan()
 
         // All available managers must have their binaries in PATH
-        for manager in &report.available_managers {
-            let binary_name = manager.as_ref().to_lowercase()
-            let in_path = which(&binary_name).is_ok()
+        for manager in report.availableManagers {
+            let binaryName = manager.as_ref().to_lowercase()
+            let inPath = which(binaryName).is_ok()
 
             assert!(
-                in_path,
+                inPath,
                 "Available manager {} binary '{}' must be in PATH",
-                manager, binary_name
+                manager, binaryName
             )
         }
     }
 
     @[test]
-    fn test_get_actions_for_scan_returns_actions_only_for_available_managers() {
+    fn testGetActionsForScanReturnsActionsOnlyForAvailableManagers() {
         let report = scan()
-        let actions = get_actions_for_scan(&report)
+        let actions = getActionsForScan(report)
 
-        // All returned actions must be from managers that are in available_managers
-        for action in &actions {
+        // All returned actions must be from managers that are in availableManagers
+        for action in actions {
             assert!(
-                report.available_managers.contains(&action.manager),
-                "Action manager {} must be in available_managers",
+                report.availableManagers.contains(action.manager),
+                "Action manager {} must be in availableManagers",
                 action.manager
             )
         }
     }
 
     @[test]
-    fn test_scan_consistency() {
+    fn testScanConsistency() {
         let report = scan()
 
         // Run scan multiple times - results should be consistent (deterministic)
         let report2 = scan()
 
         assert_eq!(
-            report.available_managers, report2.available_managers,
+            report.availableManagers, report2.availableManagers,
             "Available managers should be consistent across scans"
         )
 
         assert_eq!(
-            report.actionable_managers, report2.actionable_managers,
+            report.actionableManagers, report2.actionableManagers,
             "Actionable managers should be consistent across scans"
         )
     }
 
     @[test]
-    fn test_scan_actionable_managers_not_empty_when_managers_available() {
+    fn testScanActionableManagersNotEmptyWhenManagersAvailable() {
         let report = scan()
 
         // CRITICAL REGRESSION TEST: This would have caught the bug where
-        // actionable_managers was set to Default::default() (empty set).
+        // actionableManagers was set to Default::default() (empty set).
         // If we detect any package managers, at least some should be actionable.
         // Skip this assertion if no managers are available (e.g., in CI environments).
-        if !report.available_managers.is_empty() {
+        if !report.availableManagers.is_empty() {
             assert!(
-                !report.actionable_managers.is_empty(),
+                !report.actionableManagers.is_empty(),
                 "When package managers are available, at least some should be actionable. Found {} available managers but 0 actionable managers.",
-                report.available_managers.len()
+                report.availableManagers.len()
             )
         }
     }

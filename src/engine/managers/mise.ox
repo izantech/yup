@@ -6,16 +6,16 @@ import super.{Action, Manager, PackageManager}
 public struct MiseManager
 
 extension MiseManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![
+    fn updateActions(): [Action] {
+        [
             Action.new(
-                Manager.Mise,
+                Manager.mise,
                 "mise self-update",
                 "Update mise itself",
                 false
             ),
             Action.new(
-                Manager.Mise,
+                Manager.mise,
                 "mise plugins update",
                 "Update all mise plugins",
                 false
@@ -23,18 +23,18 @@ extension MiseManager: PackageManager {
         ]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Mise,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.mise,
             "mise upgrade",
             "Upgrade all mise-managed tools",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Mise,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.mise,
             "mise outdated",
             "Check for outdated mise-managed tools",
             false

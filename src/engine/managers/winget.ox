@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct WingetManager
 
 extension WingetManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // winget upgrade does both update and upgrade
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Winget,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.winget,
             "winget upgrade --all --silent --disable-interactivity --accept-package-agreements --accept-source-agreements",
             "Upgrade all packages",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Winget,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.winget,
             "winget list --upgrade-available",
             "Check for available upgrades",
             false

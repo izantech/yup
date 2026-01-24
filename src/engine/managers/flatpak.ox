@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct FlatpakManager
 
 extension FlatpakManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // flatpak update does both update and upgrade
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Flatpak,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.flatpak,
             "flatpak update -y",
             "Update all Flatpak applications",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Flatpak,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.flatpak,
             "flatpak remote-ls --updates",
             "Check for available updates",
             false

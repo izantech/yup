@@ -6,27 +6,27 @@ import super.{Action, Manager, PackageManager}
 public struct GemManager
 
 extension GemManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Gem,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.gem,
             "gem update --system",
             "Update RubyGems itself",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Gem,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.gem,
             "gem update",
             "Update all installed gems",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Gem,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.gem,
             "gem outdated",
             "Check for outdated Ruby gems",
             false

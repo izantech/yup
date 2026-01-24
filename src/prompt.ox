@@ -5,16 +5,16 @@ import std.collections.HashSet
 import dialoguer.{Confirm, MultiSelect, theme.ColorfulTheme}
 
 import crate.config.Config
-import crate.engine.{Action, Manager, ScanReport, get_actions_for_scan}
+import crate.engine.{Action, Manager, ScanReport, getActionsForScan}
 
 /// Run the configuration wizard
-/// Returns (Config, should_execute: bool)
-public fn run_wizard(report: &ScanReport): anyhow.Result<(Config, bool)> {
+/// Returns (Config, shouldExecute: bool)
+public fn runWizard(report: ScanReport): anyhow.Result<(Config, bool)> {
     println!("\n=== yup - Development Tool Updater ===\n")
 
     // Get actionable managers sorted (only those with actual update/upgrade actions)
-    var managers: Vec<Manager> = report.actionable_managers.iter().copied().collect()
-    managers.sort_by_key({ m -> m.to_string() })
+    var managers: [Manager] = report.actionableManagers.iter().copied().collect()
+    managers.sort_by_key { it.to_string() }
 
     if managers.is_empty() {
         println!("No package managers with available actions detected on this system.")
@@ -25,13 +25,13 @@ public fn run_wizard(report: &ScanReport): anyhow.Result<(Config, bool)> {
     println!("Detected {} package managers:\n", managers.len())
 
     // Multi-select for managers
-    let manager_names: Vec<String> = managers.iter().map({ m -> m.to_string() }).collect()
-    let defaults: Vec<bool> = managers.iter().map({ _ -> true }).collect()
+    let managerNames: [String] = managers.iter().map { it.to_string() }.collect()
+    let defaults: [bool] = managers.iter().map { true }.collect()
 
-    let selections = MultiSelect.with_theme(&ColorfulTheme.default())
+    let selections = MultiSelect.with_theme(ColorfulTheme.default())
         .with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)")
-        .items(&manager_names)
-        .defaults(&defaults)
+        .items(managerNames)
+        .defaults(defaults)
         .interact()?
 
     if selections.is_empty() {
@@ -39,60 +39,60 @@ public fn run_wizard(report: &ScanReport): anyhow.Result<(Config, bool)> {
         return Ok((Config.default(), false))
     }
 
-    let enabled_managers: Vec<Manager> = selections.iter().map({ i -> managers[*i] }).collect()
+    let enabledManagers: [Manager] = selections.iter().map { managers[*it] }.collect()
 
     // Build config
     let config = Config(
-        enabled_managers: enabled_managers.clone()
+        enabledManagers: enabledManagers.clone()
     )
 
     // Preview commands
     println!("\n--- Commands to run ---\n")
-    let actions = get_filtered_actions(&config, report)
+    let actions = getFilteredActions(config, report)
 
     if actions.is_empty() {
         println!("  (no actions available for selected managers)\n")
     } else {
-        for action in &actions {
-            let sudo_marker = if action.requires_privilege {
+        for action in actions {
+            let sudoMarker = if action.requiresPrivilege {
                 " [sudo]"
             } else {
                 ""
             }
             println!(
                 "  {} - {}{}",
-                action.command, action.description, sudo_marker
+                action.command, action.description, sudoMarker
             )
         }
         println!()
     }
 
     // Confirm execution
-    let should_execute = if actions.is_empty() {
-        Confirm.with_theme(&ColorfulTheme.default())
+    let shouldExecute = if actions.is_empty() {
+        Confirm.with_theme(ColorfulTheme.default())
             .with_prompt("Save this configuration?")
             .default(true)
             .interact()?
     } else {
-        Confirm.with_theme(&ColorfulTheme.default())
+        Confirm.with_theme(ColorfulTheme.default())
             .with_prompt("Save configuration and run these commands?")
             .default(true)
             .interact()?
     }
 
-    Ok((config, should_execute))
+    Ok((config, shouldExecute))
 }
 
 /// Get actions filtered by config
-public fn get_filtered_actions(
-    config: &Config,
-    report: &ScanReport
-): Vec<Action> {
-    let all_actions = get_actions_for_scan(report)
-    let enabled_set: HashSet<Manager> = config.enabled_manager_set()
+public fn getFilteredActions(
+    config: Config,
+    report: ScanReport
+): [Action] {
+    let allActions = getActionsForScan(report)
+    let enabledSet: HashSet<Manager> = config.enabledManagerSet()
 
-    all_actions
+    allActions
         .into_iter()
-        .filter({ a -> enabled_set.contains(&a.manager) })
+        .filter { enabledSet.contains(it.manager) }
         .collect()
 }

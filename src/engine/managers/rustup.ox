@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct RustupManager
 
 extension RustupManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Rustup,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.rustup,
             "rustup update",
             "Update all installed Rust toolchains",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
+    fn upgradeActions(): [Action] {
         // Rustup manages toolchains, not packages
-        vec![]
+        []
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Rustup,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.rustup,
             "rustup check",
             "Check for Rust toolchain updates",
             false

@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct PipxManager
 
 extension PipxManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // pipx is typically managed by pip or brew, no self-update command
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
+    fn upgradeActions(): [Action] {
         // pipx upgrade-all is safe because each app is in its own isolated venv
-        vec![Action.new(
-            Manager.Pipx,
+        [Action.new(
+            Manager.pipx,
             "pipx upgrade-all",
             "Upgrade all pipx-installed packages",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
+    fn checkActions(): [Action] {
         // pipx doesn't provide a read-only "outdated" or dry-run upgrade command.
-        vec![]
+        []
     }
 }

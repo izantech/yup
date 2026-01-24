@@ -6,25 +6,25 @@ import super.{Action, Manager, PackageManager}
 public struct BrewManager
 
 extension BrewManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Brew,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.brew,
             "brew update",
             "Update Homebrew formulae",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![
+    fn upgradeActions(): [Action] {
+        [
             Action.new(
-                Manager.Brew,
+                Manager.brew,
                 "brew upgrade",
                 "Upgrade outdated formulae",
                 false
             ),
             Action.new(
-                Manager.Brew,
+                Manager.brew,
                 "brew cleanup",
                 "Remove old versions",
                 false
@@ -32,9 +32,9 @@ extension BrewManager: PackageManager {
         ]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Brew,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.brew,
             "brew outdated",
             "Check for outdated formulae",
             false

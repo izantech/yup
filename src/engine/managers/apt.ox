@@ -6,25 +6,25 @@ import super.{Action, Manager, PackageManager}
 public struct AptManager
 
 extension AptManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Apt,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.apt,
             "apt update",
             "Update package index",
             true
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![
+    fn upgradeActions(): [Action] {
+        [
             Action.new(
-                Manager.Apt,
+                Manager.apt,
                 "apt upgrade -y",
                 "Upgrade installed packages",
                 true
             ),
             Action.new(
-                Manager.Apt,
+                Manager.apt,
                 "apt autoremove -y",
                 "Remove unused dependencies",
                 true
@@ -32,9 +32,9 @@ extension AptManager: PackageManager {
         ]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Apt,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.apt,
             "apt list --upgradable",
             "Check for available updates",
             false

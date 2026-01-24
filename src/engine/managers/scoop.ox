@@ -6,27 +6,27 @@ import super.{Action, Manager, PackageManager}
 public struct ScoopManager
 
 extension ScoopManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Scoop,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.scoop,
             "scoop update",
             "Update Scoop and manifests",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Scoop,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.scoop,
             "scoop update *",
             "Update all packages",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Scoop,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.scoop,
             "scoop status",
             "Check for outdated packages",
             false

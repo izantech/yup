@@ -6,27 +6,27 @@ import super.{Action, Manager, PackageManager}
 public struct PortManager
 
 extension PortManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Port,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.port,
             "port selfupdate",
             "Update MacPorts and port definitions",
             true
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Port,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.port,
             "port upgrade outdated",
             "Upgrade outdated ports",
             true
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Port,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.port,
             "port outdated",
             "Check for outdated ports",
             false

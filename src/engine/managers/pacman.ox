@@ -7,30 +7,30 @@ import which.which
 public struct PacmanManager
 
 extension PacmanManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // pacman -Syu combines update+upgrade, no separate update needed
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Pacman,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.pacman,
             "pacman -Syu --noconfirm",
             "Sync and upgrade all packages",
             true
         )]
     }
 
-    fn check_actions(): Vec<Action> {
+    fn checkActions(): [Action] {
         if which("checkupdates").is_ok() {
-            vec![Action.new(
-                Manager.Pacman,
+            [Action.new(
+                Manager.pacman,
                 "checkupdates",
                 "Check for available updates",
                 false
             )]
         } else {
-            vec![]
+            []
         }
     }
 }

@@ -6,27 +6,27 @@ import super.{Action, Manager, PackageManager}
 public struct PnpmManager
 
 extension PnpmManager: PackageManager {
-    fn update_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Pnpm,
+    fn updateActions(): [Action] {
+        [Action.new(
+            Manager.pnpm,
             "pnpm self-update",
             "Update pnpm itself",
             false
         )]
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Pnpm,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.pnpm,
             "pnpm update -g",
             "Update global pnpm packages",
             false
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Pnpm,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.pnpm,
             "pnpm outdated -g",
             "Check for outdated global pnpm packages",
             false

@@ -6,23 +6,23 @@ import super.{Action, Manager, PackageManager}
 public struct ChocoManager
 
 extension ChocoManager: PackageManager {
-    fn update_actions(): Vec<Action> {
+    fn updateActions(): [Action] {
         // choco upgrade does both update and upgrade
-        vec![]
+        []
     }
 
-    fn upgrade_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Choco,
+    fn upgradeActions(): [Action] {
+        [Action.new(
+            Manager.choco,
             "choco upgrade all -y",
             "Upgrade all packages",
             true
         )]
     }
 
-    fn check_actions(): Vec<Action> {
-        vec![Action.new(
-            Manager.Choco,
+    fn checkActions(): [Action] {
+        [Action.new(
+            Manager.choco,
             "choco outdated",
             "Check for outdated packages",
             false
