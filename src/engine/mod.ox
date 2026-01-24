@@ -6,7 +6,7 @@ external module filter
 external module managers
 
 // Re-export key types
-public import types.{Action, Manager, ScanReport}
-public import scan.{scan, getActionsForScan, getCheckActionsForScan}
+public import types.{ Action, Manager, ScanReport }
+public import scan.{ scan, getActionsForScan, getCheckActionsForScan }
 public import filter.filterActions
-public import managers.{PackageManager, createManager}
+public import managers.{ PackageManager, createManager }
