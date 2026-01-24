@@ -7,11 +7,11 @@ import which.which
 public struct PacmanManager
 
 extension PacmanManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     // pacman -Syu combines update+upgrade, no separate update needed
     []
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.pacman,
@@ -21,7 +21,7 @@ extension PacmanManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     if which("checkupdates").isOk() {
       [
         Action(

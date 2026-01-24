@@ -3,7 +3,7 @@
 import super.types.Action
 
 /// - `skip`: If non-null, exclude actions from managers whose debug name matches one of the strings
-public fn filterActions(actions: [Action], only: [String]?, skip: [String]?): [Action] {
+public fn filterActions(actions: Vec<Action>, only: Vec<String>?, skip: Vec<String>?): Vec<Action> {
   let normalizeList = { items: [String] ->
     let normalized: [String] = items.iter().map { it.trim().toLowercase() }.filter { !it.isEmpty() }.collect()
     if normalized.isEmpty() { null } else { normalized }

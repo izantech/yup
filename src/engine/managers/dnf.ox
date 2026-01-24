@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct DnfManager
 
 extension DnfManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     // DNF auto-syncs during upgrade, no separate update needed
     []
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.dnf,
@@ -26,7 +26,7 @@ extension DnfManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.dnf,

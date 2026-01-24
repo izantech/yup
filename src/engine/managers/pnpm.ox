@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct PnpmManager
 
 extension PnpmManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     [
       Action(
         manager: Manager.pnpm,
@@ -16,7 +16,7 @@ extension PnpmManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.pnpm,
@@ -26,7 +26,7 @@ extension PnpmManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.pnpm,

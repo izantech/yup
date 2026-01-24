@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct MiseManager
 
 extension MiseManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     [
       Action(
         manager: Manager.mise,
@@ -22,7 +22,7 @@ extension MiseManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.mise,
@@ -32,7 +32,7 @@ extension MiseManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.mise,

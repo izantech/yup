@@ -19,8 +19,8 @@ fn isCargoUpdateAvailable(): bool {
 }
 
 extension CargoManager: PackageManager {
-  fn updateActions(): [Action] { [] }
-  fn upgradeActions(): [Action] {
+  fn updateActions(): Vec<Action> { [] }
+  fn upgradeActions(): Vec<Action> {
     if isCargoUpdateAvailable() {
       [
         Action(
@@ -34,7 +34,7 @@ extension CargoManager: PackageManager {
       []
     }
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     if isCargoUpdateAvailable() {
       [
         Action(

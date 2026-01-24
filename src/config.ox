@@ -5,20 +5,21 @@ import std.path.PathBuf
 import directories.ProjectDirs
 import serde.{ Deserialize, Serialize }
 import anyhow.{ Result, anyhow }
+import toml
 import crate.engine.Manager
 
 /// User configuration for yup
 @[derive(Debug , Clone , Serialize , Deserialize , Default)]
-public struct Config(enabledManagers: [Manager])
+public struct Config(enabledManagers: Vec<Manager>)
 
 extension Config {
   /// Get the config file path (~/.config/yup/config.toml)
-  public fn path(): PathBuf? {
+  public static fn path(): PathBuf? {
     let projDirs = ProjectDirs.from("", "", "yup")?
     projDirs.configDir().join("config.toml")
   }
   /// Load config from disk, returns null if not exists or invalid
-  public fn load(): Config? {
+  public static fn load(): Config? {
     let path = Config.path()?
     let content = std.fs.readToString(path).ok()?
     toml.fromStr(content).ok()
@@ -37,7 +38,7 @@ extension Config {
     Ok(())
   }
   /// Check if config file exists
-  public fn exists(): bool { Config.path().map { it.exists() }.unwrapOr(false) }
+  public static fn exists(): bool { Config.path().map { it.exists() }.unwrapOr(false) }
   /// Get enabled managers as a HashSet
   public consuming fn enabledManagerSet(): HashSet<Manager> { self.enabledManagers.iter().copied().collect() }
 }

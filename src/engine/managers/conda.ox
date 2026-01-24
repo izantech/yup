@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct CondaManager
 
 extension CondaManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     [
       Action(
         manager: Manager.conda,
@@ -16,7 +16,7 @@ extension CondaManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     // Upgrading all base packages can break environments
     [
       Action(
@@ -27,7 +27,7 @@ extension CondaManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.conda,

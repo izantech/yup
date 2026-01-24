@@ -84,7 +84,7 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_wizard_flow(args: &Cli) -> anyhow::Result<()> {
-    let report = scan::scan();
+    let report = scan();
     let (config, should_execute) = prompt::run_wizard(&report)?;
 
     if should_execute {
@@ -107,11 +107,11 @@ async fn run_wizard_flow(args: &Cli) -> anyhow::Result<()> {
 /// Run with all detected managers (no config, -y flag)
 async fn run_without_config(args: &Cli) -> anyhow::Result<()> {
     // Scan and use detected managers
-    let report = scan::scan();
+    let report = scan();
     let all_actions = get_actions_for_scan(&report);
 
     // Apply CLI filters
-    let actions = filter_actions(all_actions, args.only.as_deref(), args.skip.as_deref());
+    let actions = filter_actions(&all_actions, &args.only, &args.skip);
 
     if actions.is_empty() {
         println!("No actions to run.");
@@ -123,11 +123,11 @@ async fn run_without_config(args: &Cli) -> anyhow::Result<()> {
 
 /// Run status check - show outdated packages without updating
 async fn run_status(args: &Cli) -> anyhow::Result<()> {
-    let report = scan::scan();
+    let report = scan();
     let all_actions = get_check_actions_for_scan(&report);
 
     // Apply CLI filters
-    let actions = filter_actions(all_actions, args.only.as_deref(), args.skip.as_deref());
+    let actions = filter_actions(&all_actions, &args.only, &args.skip);
 
     if actions.is_empty() {
         println!("No status checks available for detected managers.");
@@ -169,13 +169,13 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
 
 async fn run_with_config(args: &Cli) -> anyhow::Result<()> {
     let config = Config::load().unwrap_or_default();
-    let report = scan::scan();
+    let report = scan();
 
     // Build actions from config
     let actions = prompt::get_filtered_actions(&config, &report);
 
     // Apply CLI overrides using filter_actions
-    let actions = filter_actions(actions, args.only.as_deref(), args.skip.as_deref());
+    let actions = filter_actions(&actions, &args.only, &args.skip);
 
     if actions.is_empty() {
         println!("No actions to run with current configuration.");
@@ -189,7 +189,7 @@ async fn run_with_config(args: &Cli) -> anyhow::Result<()> {
     run_actions(&actions, args).await
 }
 
-async fn run_actions(actions: &[engine::types::Action], args: &Cli) -> anyhow::Result<()> {
+async fn run_actions(actions: &[engine::Action], args: &Cli) -> anyhow::Result<()> {
     // Display planned actions
     println!("Planned actions ({}):", actions.len());
     for (i, action) in actions.iter().enumerate() {

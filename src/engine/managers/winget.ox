@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct WingetManager
 
 extension WingetManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     // winget upgrade does both update and upgrade
     []
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.winget,
@@ -20,7 +20,7 @@ extension WingetManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.winget,

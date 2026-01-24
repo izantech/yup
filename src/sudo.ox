@@ -11,7 +11,7 @@ public fn isSudoAvailable(): bool { which("sudo").isOk() }
 /// (e.g., from a recent sudo invocation within the timeout period)
 public async fn hasValidCredentials(): bool {
   // Use output() which captures all streams, avoiding keyword conflicts
-  let result = await ProcessCommand("sudo").args(["-n", "true"]).output()
+  let result = await ProcessCommand.new("sudo").args(["-n", "true"]).output()
 
   result.map { it.status.success() }.unwrapOr(false)
 }
@@ -19,7 +19,7 @@ public async fn hasValidCredentials(): bool {
 /// Refresh sudo credentials by prompting the user
 /// Returns true if credentials were successfully obtained
 public async fn refreshCredentials(): Result<bool> {
-  let status = await ProcessCommand("sudo").arg("-v").status()
+  let status = await ProcessCommand.new("sudo").arg("-v").status()
   let status = status?
 
   Ok(status.success())

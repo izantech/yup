@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct PortManager
 
 extension PortManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     [
       Action(
         manager: Manager.port,
@@ -16,7 +16,7 @@ extension PortManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.port,
@@ -26,7 +26,7 @@ extension PortManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.port,

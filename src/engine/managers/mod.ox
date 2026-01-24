@@ -4,9 +4,9 @@ import super.types.{ Action, Manager }
 
 /// Trait defining the interface for package manager implementations.
 public trait PackageManager {
-  fn updateActions(): [Action]
-  fn upgradeActions(): [Action]
-  fn checkActions(): [Action]
+  fn updateActions(): Vec<Action>
+  fn upgradeActions(): Vec<Action>
+  fn checkActions(): Vec<Action>
 }
 
 // Cross-platform managers
@@ -65,25 +65,25 @@ public import winget.WingetManager
 /// Returns null if no implementation exists for this Manager.
 public fn createManager(manager: Manager): Box<dyn PackageManager>? {
   match manager {
-    Manager.conda -> Box(CondaManager) as Box<dyn PackageManager>
-    Manager.mise -> Box(MiseManager) as Box<dyn PackageManager>
-    Manager.cargo -> Box(CargoManager) as Box<dyn PackageManager>
-    Manager.gem -> Box(GemManager) as Box<dyn PackageManager>
-    Manager.npm -> Box(NpmManager) as Box<dyn PackageManager>
-    Manager.pipx -> Box(PipxManager) as Box<dyn PackageManager>
-    Manager.pnpm -> Box(PnpmManager) as Box<dyn PackageManager>
-    Manager.rustup -> Box(RustupManager) as Box<dyn PackageManager>
-    Manager.brew -> Box(BrewManager) as Box<dyn PackageManager>
-    Manager.mas -> Box(MasManager) as Box<dyn PackageManager>
-    Manager.port -> Box(PortManager) as Box<dyn PackageManager>
-    Manager.softwareupdate -> Box(SoftwareUpdateManager) as Box<dyn PackageManager>
-    Manager.apt -> Box(AptManager) as Box<dyn PackageManager>
-    Manager.dnf -> Box(DnfManager) as Box<dyn PackageManager>
-    Manager.flatpak -> Box(FlatpakManager) as Box<dyn PackageManager>
-    Manager.pacman -> Box(PacmanManager) as Box<dyn PackageManager>
-    Manager.snap -> Box(SnapManager) as Box<dyn PackageManager>
-    Manager.choco -> Box(ChocoManager) as Box<dyn PackageManager>
-    Manager.scoop -> Box(ScoopManager) as Box<dyn PackageManager>
-    Manager.winget -> Box(WingetManager) as Box<dyn PackageManager>
+    Manager.conda -> Box.new(CondaManager) as Box<dyn PackageManager>
+    Manager.mise -> Box.new(MiseManager) as Box<dyn PackageManager>
+    Manager.cargo -> Box.new(CargoManager) as Box<dyn PackageManager>
+    Manager.gem -> Box.new(GemManager) as Box<dyn PackageManager>
+    Manager.npm -> Box.new(NpmManager) as Box<dyn PackageManager>
+    Manager.pipx -> Box.new(PipxManager) as Box<dyn PackageManager>
+    Manager.pnpm -> Box.new(PnpmManager) as Box<dyn PackageManager>
+    Manager.rustup -> Box.new(RustupManager) as Box<dyn PackageManager>
+    Manager.brew -> Box.new(BrewManager) as Box<dyn PackageManager>
+    Manager.mas -> Box.new(MasManager) as Box<dyn PackageManager>
+    Manager.port -> Box.new(PortManager) as Box<dyn PackageManager>
+    Manager.softwareupdate -> Box.new(SoftwareUpdateManager) as Box<dyn PackageManager>
+    Manager.apt -> Box.new(AptManager) as Box<dyn PackageManager>
+    Manager.dnf -> Box.new(DnfManager) as Box<dyn PackageManager>
+    Manager.flatpak -> Box.new(FlatpakManager) as Box<dyn PackageManager>
+    Manager.pacman -> Box.new(PacmanManager) as Box<dyn PackageManager>
+    Manager.snap -> Box.new(SnapManager) as Box<dyn PackageManager>
+    Manager.choco -> Box.new(ChocoManager) as Box<dyn PackageManager>
+    Manager.scoop -> Box.new(ScoopManager) as Box<dyn PackageManager>
+    Manager.winget -> Box.new(WingetManager) as Box<dyn PackageManager>
   }
 }

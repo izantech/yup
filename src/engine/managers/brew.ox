@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct BrewManager
 
 extension BrewManager: PackageManager {
-  fn updateActions(): [Action] {
+  fn updateActions(): Vec<Action> {
     [
       Action(
         manager: Manager.brew,
@@ -16,7 +16,7 @@ extension BrewManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): [Action] {
+  fn upgradeActions(): Vec<Action> {
     [
       Action(
         manager: Manager.brew,
@@ -32,7 +32,7 @@ extension BrewManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): [Action] {
+  fn checkActions(): Vec<Action> {
     [
       Action(
         manager: Manager.brew,
