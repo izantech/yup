@@ -11,7 +11,12 @@ This project has been migrated from Rust to a hybrid Rust/Oxide codebase. The bu
 - Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox)
 - Phase 5: CLI & Main (kept in Rust for complex macro support)
 
-**Build Command:** `cargo oxide build`
+**Build Commands:**
+- `cd oxide-gen && cargo build` - Build directly (recommended)
+- `cd oxide-gen && cargo test` - Run tests
+- `cd oxide-gen && cargo run -- --dry-run` - Test the binary
+
+**Note:** Due to the hybrid Rust/Oxide structure, build directly from `oxide-gen/` rather than using `cargo oxide build` from the root. The root `cargo oxide` command would regenerate oxide-gen and overwrite the manually-maintained Rust files.
 
 ## Project Structure
 
@@ -166,16 +171,17 @@ on all platforms, and runtime detection (via `which`) handles availability.
 ### Unit Tests
 
 ```bash
-cargo oxide test
+cd oxide-gen && cargo test
 ```
 
 ### Manual Testing
 
 ```bash
-cargo oxide run -- --dry-run      # Preview actions without executing
-cargo oxide run -- --status       # Check for outdated packages
-cargo oxide run -- --verbose      # See command output
-cargo oxide run -- --only brew    # Test specific manager
+cd oxide-gen
+cargo run -- --dry-run      # Preview actions without executing
+cargo run -- --status       # Check for outdated packages
+cargo run -- --verbose      # See command output
+cargo run -- --only brew    # Test specific manager
 ```
 
 ## Build & Release
@@ -183,7 +189,7 @@ cargo oxide run -- --only brew    # Test specific manager
 ### Local Build
 
 ```bash
-cargo oxide build --release
+cd oxide-gen && cargo build --release
 ```
 
 ### Release Process
