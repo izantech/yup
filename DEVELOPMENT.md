@@ -1,23 +1,35 @@
 # Development Guide
 
+## Oxide Migration Status
+
+This project is being migrated from Rust to Oxide syntax. The build uses `cargo oxide` instead of `cargo`.
+
+**Completed:**
+- Phase 1: Infrastructure (experimental/oxide branch)
+- Phase 2: Core types and engine modules
+
+**In Progress:**
+- Phase 3: Manager implementations
+
+**Build Command:** `cargo oxide build`
+
 ## Project Structure
 
 ```
 src/
-├── main.rs           # Entry point, CLI flow, command execution
-├── cli.rs            # Clap CLI argument definitions
-├── config.rs         # Config loading/saving (TOML)
-├── prompt.rs         # Interactive wizard (dialoguer)
-├── sudo.rs           # Sudo credential management (Unix only)
+├── main.rs           # Entry point, CLI flow, command execution (pending migration)
+├── cli.rs            # Clap CLI argument definitions (pending migration)
+├── config.rs         # Config loading/saving (TOML) (pending migration)
+├── prompt.rs         # Interactive wizard (dialoguer) (pending migration)
+├── sudo.rs           # Sudo credential management (Unix only) (pending migration)
 └── engine/
-    ├── mod.rs        # Module exports
-    ├── types.rs      # Core types: Manager, Action, DetectedTool, ScanReport
-    ├── scan.rs       # System scanning, tool detection
-    ├── detect.rs     # Path-based manager detection (provenance)
-    ├── filter.rs     # Action filtering (--only/--skip)
+    ├── mod.ox        # Module exports (MIGRATED)
+    ├── types.ox      # Core types: Manager, Action, ScanReport (MIGRATED)
+    ├── scan.rs       # System scanning, tool detection (pending migration)
+    ├── filter.rs     # Action filtering (--only/--skip) (pending migration)
     └── managers/
-        ├── mod.rs    # PackageManager trait, create_manager() factory
-        └── *.rs      # Individual manager implementations
+        ├── mod.ox    # PackageManager trait, create_manager() factory (MIGRATED)
+        └── *.rs      # Individual manager implementations (pending migration)
 ```
 
 ## Toolchain
@@ -75,48 +87,57 @@ Update the `FromStr` and `as_str`/`display_name` implementations in the same fil
 
 ### Step 2: Create Implementation
 
-Create `src/engine/managers/mymanager.rs`:
+Create `src/engine/managers/mymanager.ox`:
 
-```rust
-use super::{Action, Manager, PackageManager};
+```oxide
+//! MyManager package manager
 
-pub struct MyManagerManager;
+import super.{Action, Manager, PackageManager}
 
-impl PackageManager for MyManagerManager {
-    fn update_actions(&self) -> Vec<Action> {
-        vec![Action::new(
-            Manager::MyManager,
+/// MyManager package manager
+public struct MyManagerManager
+
+extension MyManagerManager: PackageManager {
+    fn update_actions(): Vec<Action> {
+        vec![Action.new(
+            Manager.MyManager,
             "mymanager refresh",
             "Refresh MyManager index",
-            false,  // Set true if needs sudo
+            false
         )]
     }
 
-    fn upgrade_actions(&self) -> Vec<Action> {
-        vec![Action::new(
-            Manager::MyManager,
+    fn upgrade_actions(): Vec<Action> {
+        vec![Action.new(
+            Manager.MyManager,
             "mymanager upgrade --all",
             "Upgrade MyManager packages",
-            false,
+            false
         )]
+    }
+
+    fn check_actions(): Vec<Action> {
+        vec![]
     }
 }
 ```
 
-### Step 3: Register in mod.rs
+### Step 3: Register in mod.ox
 
-In `src/engine/managers/mod.rs`:
+In `src/engine/managers/mod.ox`:
 
-```rust
-// Add module declaration (with #[cfg] if platform-specific)
-mod mymanager;
-pub use mymanager::MyManagerManager;
+```oxide
+// Add module declaration
+external module mymanager
+
+// Add re-export
+public import mymanager.MyManagerManager
 
 // Add case in create_manager()
-pub fn create_manager(manager: Manager) -> Option<Box<dyn PackageManager>> {
+public fn create_manager(manager: Manager): Box<dyn PackageManager>? {
     match manager {
         // ... existing cases
-        Manager::MyManager => Some(Box::new(MyManagerManager)),
+        Manager.MyManager -> Some(Box.new(MyManagerManager) as Box<dyn PackageManager>)
     }
 }
 ```
@@ -140,36 +161,28 @@ const TOOLS: &[&str] = &[
 
 ## Platform Support
 
-Use conditional compilation for platform-specific managers:
+**Note:** Due to current Oxide codegen limitations, platform-specific `@[cfg(...)]`
+attributes on modules and imports are not fully supported. All managers are compiled
+on all platforms, and runtime detection (via `which`) handles availability.
 
-```rust
-#[cfg(target_os = "macos")]
-mod brew;
-
-#[cfg(target_os = "linux")]
-mod apt;
-
-#[cfg(target_os = "windows")]
-mod winget;
-```
-
-Cross-platform managers (npm, cargo, asdf, etc.) have no `#[cfg]` attribute.
+All managers are compiled cross-platform. The `scan.rs` file uses `which` to detect
+which managers are actually installed and available on the current system.
 
 ## Testing
 
 ### Unit Tests
 
 ```bash
-cargo test
+cargo oxide test
 ```
 
 ### Manual Testing
 
 ```bash
-cargo run -- --dry-run      # Preview actions without executing
-cargo run -- --status       # Check for outdated packages
-cargo run -- --verbose      # See command output
-cargo run -- --only brew    # Test specific manager
+cargo oxide run -- --dry-run      # Preview actions without executing
+cargo oxide run -- --status       # Check for outdated packages
+cargo oxide run -- --verbose      # See command output
+cargo oxide run -- --only brew    # Test specific manager
 ```
 
 ## Build & Release
@@ -177,7 +190,7 @@ cargo run -- --only brew    # Test specific manager
 ### Local Build
 
 ```bash
-cargo build --release
+cargo oxide build --release
 ```
 
 ### Release Process
