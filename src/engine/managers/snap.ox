@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct SnapManager
 
 extension SnapManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     // snap refresh does both update and upgrade
     []
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.snap,
@@ -20,7 +20,7 @@ extension SnapManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.snap,

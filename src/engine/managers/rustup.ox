@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct RustupManager
 
 extension RustupManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     [
       Action(
         manager: Manager.rustup,
@@ -16,11 +16,11 @@ extension RustupManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     // Rustup manages toolchains, not packages
     []
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.rustup,

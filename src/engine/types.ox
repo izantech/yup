@@ -34,18 +34,6 @@ public enum Manager {
 @[derive(Debug , Clone)]
 public struct Action(manager: Manager, command: String, description: String, requiresPrivilege: bool)
 
-extension Action {
-  /// Create a new action
-  public fn new(manager: Manager, command: impl Into<String>, description: impl Into<String>, requiresPrivilege: bool): Action {
-    Action(
-      manager: manager,
-      command: command.into(),
-      description: description.into(),
-      requiresPrivilege: requiresPrivilege,
-    )
-  }
-}
-
 /// Comprehensive report of the system scan results.
 @[derive(Debug , Default)]
 public struct ScanReport(availableManagers: HashSet<Manager>, actionableManagers: HashSet<Manager>)

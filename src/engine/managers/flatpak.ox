@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct FlatpakManager
 
 extension FlatpakManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     // flatpak update does both update and upgrade
     []
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.flatpak,
@@ -20,7 +20,7 @@ extension FlatpakManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.flatpak,

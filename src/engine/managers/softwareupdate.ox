@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct SoftwareUpdateManager
 
 extension SoftwareUpdateManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     // softwareupdate list is automatic
     []
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.softwareupdate,
@@ -20,7 +20,7 @@ extension SoftwareUpdateManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.softwareupdate,

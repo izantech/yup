@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct AptManager
 
 extension AptManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     [
       Action(
         manager: Manager.apt,
@@ -16,7 +16,7 @@ extension AptManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.apt,
@@ -32,7 +32,7 @@ extension AptManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.apt,

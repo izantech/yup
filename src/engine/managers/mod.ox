@@ -4,9 +4,9 @@ import super.types.{ Action, Manager }
 
 /// Trait defining the interface for package manager implementations.
 public trait PackageManager {
-  fn updateActions(): Vec<Action>
-  fn upgradeActions(): Vec<Action>
-  fn checkActions(): Vec<Action>
+  fn updateActions(): Array<Action>
+  fn upgradeActions(): Array<Action>
+  fn checkActions(): Array<Action>
 }
 
 // Cross-platform managers

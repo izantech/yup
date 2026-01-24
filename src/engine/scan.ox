@@ -24,7 +24,7 @@ public fn scan(): ScanReport {
 
 /// Get actions for managers detected in the scan.
 /// Only returns actions for managers that were actually detected on the system.
-public fn getActionsForScan(report: ScanReport): Vec<Action> {
+public fn getActionsForScan(report: ScanReport): Array<Action> {
   report
     .availableManagers
     .iter()
@@ -35,7 +35,7 @@ public fn getActionsForScan(report: ScanReport): Vec<Action> {
 
 /// Get check actions for managers detected in the scan.
 /// Returns actions to check for outdated packages without updating.
-public fn getCheckActionsForScan(report: ScanReport): Vec<Action> {
+public fn getCheckActionsForScan(report: ScanReport): Array<Action> {
   report
     .availableManagers
     .iter()

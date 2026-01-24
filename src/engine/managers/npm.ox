@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct NpmManager
 
 extension NpmManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     [
       Action(
         manager: Manager.npm,
@@ -16,7 +16,7 @@ extension NpmManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.npm,
@@ -26,7 +26,7 @@ extension NpmManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.npm,

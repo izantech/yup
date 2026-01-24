@@ -10,7 +10,7 @@ import crate.engine.Manager
 
 /// User configuration for yup
 @[derive(Debug , Clone , Serialize , Deserialize , Default)]
-public struct Config(enabledManagers: Vec<Manager>)
+public struct Config(enabledManagers: Array<Manager>)
 
 extension Config {
   /// Get the config file path (~/.config/yup/config.toml)
@@ -22,7 +22,7 @@ extension Config {
   public static fn load(): Config? {
     let path = Config.path()?
     let content = std.fs.readToString(path).ok()?
-    toml.fromStr(content).ok()
+    toml.fromStr(&content).ok()
   }
   /// Save config to disk
   public consuming fn save(): Result<()> {
@@ -33,7 +33,7 @@ extension Config {
     if let parent = path.parent() {
       std.fs.createDirAll(parent)?
     }
-    let content = toml.toStringPretty(self)?
+    let content = toml.toStringPretty(&self)?
     std.fs.write(path, content)?
     Ok(())
   }

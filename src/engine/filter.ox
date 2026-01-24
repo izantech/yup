@@ -3,9 +3,9 @@
 import super.types.Action
 
 /// - `skip`: If non-null, exclude actions from managers whose debug name matches one of the strings
-public fn filterActions(actions: Vec<Action>, only: Vec<String>?, skip: Vec<String>?): Vec<Action> {
-  let normalizeList = { items: [String] ->
-    let normalized: [String] = items.iter().map { it.trim().toLowercase() }.filter { !it.isEmpty() }.collect()
+public fn filterActions(actions: Array<Action>, only: Array<String>?, skip: Array<String>?): Array<Action> {
+  let normalizeList = { items: Array<String> ->
+    let normalized: Array<String> = items.iter().map { it.trim().toLowercase() }.filter { !it.isEmpty() }.collect()
     if normalized.isEmpty() { null } else { normalized }
   }
   let onlyList = only.andThen(normalizeList)
@@ -108,8 +108,8 @@ module tests {
       makeAction(Manager.rustup),
     ]
 
-    let only: [String] = []
-    let skip: [String] = []
+    let only: Array<String> = []
+    let skip: Array<String> = []
     let filtered = filterActions(actions, only, skip)
 
     assert_eq!(filtered.len(), 3)

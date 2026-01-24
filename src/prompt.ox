@@ -12,7 +12,7 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   println!("\n=== yup - Development Tool Updater ===\n")
 
   // Get actionable managers sorted (only those with actual update/upgrade actions)
-  var managers: [Manager] = report.actionableManagers.iter().copied().collect()
+  var managers: Array<Manager> = report.actionableManagers.iter().copied().collect()
   managers.sortByKey { "$it" }
 
   if managers.isEmpty() {
@@ -24,13 +24,13 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   println!("Detected {} package managers:\n", managers.len())
 
   // Multi-select for managers
-  let managerNames: [String] = managers.iter().map { "$it" }.collect()
-  let defaults: [bool] = managers.iter().map { true }.collect()
+  let managerNames: Array<String> = managers.iter().map { "$it" }.collect()
+  let defaults: Array<Bool> = managers.iter().map { true }.collect()
 
   let selections = MultiSelect.with_theme(&ColorfulTheme.default())
     .with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)")
     .items(managerNames)
-    .defaults(defaults)
+    .defaults(&defaults)
     .interact()?
 
   if selections.isEmpty() {
@@ -38,10 +38,10 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
     return Ok((Config.default(), false))
   }
 
-  let enabledManagers: [Manager] = selections.iter().map { managers[*it] }.collect()
+  let enabledManagers: Array<Manager> = selections.iter().map { managers[*it] }.collect()
 
   // Build config
-  let config = Config(enabledManagers: enabledManagers.clone())
+  let config = Config(enabledManagers: enabledManagers.toVec())
 
   // Preview commands
   println!("\n--- Commands to run ---\n")
@@ -74,9 +74,9 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
 }
 
 /// Get actions filtered by config
-public fn getFilteredActions(config: Config, report: ScanReport): Vec<Action> {
+public fn getFilteredActions(config: Config, report: ScanReport): Array<Action> {
   let allActions = getActionsForScan(report)
   let enabledSet: HashSet<Manager> = config.enabledManagerSet()
 
-  allActions.intoIter().filter { enabledSet.contains(it.manager) }.collect()
+  allActions.intoIter().filter { enabledSet.contains(&it.manager) }.collect()
 }

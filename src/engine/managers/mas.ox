@@ -6,11 +6,11 @@ import super.{ Action, Manager, PackageManager }
 public struct MasManager
 
 extension MasManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     // mas has no separate update step
     []
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.mas,
@@ -20,7 +20,7 @@ extension MasManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.mas,

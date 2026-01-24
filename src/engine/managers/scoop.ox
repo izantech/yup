@@ -6,7 +6,7 @@ import super.{ Action, Manager, PackageManager }
 public struct ScoopManager
 
 extension ScoopManager: PackageManager {
-  fn updateActions(): Vec<Action> {
+  fn updateActions(): Array<Action> {
     [
       Action(
         manager: Manager.scoop,
@@ -16,7 +16,7 @@ extension ScoopManager: PackageManager {
       ),
     ]
   }
-  fn upgradeActions(): Vec<Action> {
+  fn upgradeActions(): Array<Action> {
     [
       Action(
         manager: Manager.scoop,
@@ -26,7 +26,7 @@ extension ScoopManager: PackageManager {
       ),
     ]
   }
-  fn checkActions(): Vec<Action> {
+  fn checkActions(): Array<Action> {
     [
       Action(
         manager: Manager.scoop,
