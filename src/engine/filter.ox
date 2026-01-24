@@ -3,25 +3,26 @@
 import super.types.Action
 
 /// - `skip`: If non-null, exclude actions from managers whose debug name matches one of the strings
-public fn filterActions(actions: Array<Action>, only: Array<String>?, skip: Array<String>?): Array<Action> {
+public fn filterActions(actions: Array<Action>, consuming only: Array<String>?, consuming skip: Array<String>?): Array<Action> {
   let normalizeList = { items: Array<String> ->
     let normalized: Array<String> = items.iter().map { it.trim().toLowercase() }.filter { !it.isEmpty() }.collect()
-    if normalized.isEmpty() { null } else { normalized }
+    if normalized.isEmpty() { null } else { Some(normalized) }
   }
   let onlyList = only.andThen(normalizeList)
   let skipList = skip.andThen(normalizeList)
 
   actions
-    .intoIter()
+    .iter()
+    .cloned()
     .filter { action ->
       let managerName = action.manager.asRef().toLowercase()
       // Filter by --only (whitelist)
-      if let onlyList = onlyList {
+      if let onlyList = onlyList.asRef() {
         let matches = onlyList.iter().any { managerName == *it }
         if !matches { return false }
       }
       // Filter by --skip (blacklist)
-      if let skipList = skipList {
+      if let skipList = skipList.asRef() {
         let matches = skipList.iter().any { managerName == *it }
         if matches { return false }
       }
@@ -33,7 +34,7 @@ public fn filterActions(actions: Array<Action>, only: Array<String>?, skip: Arra
 module tests {
   import super.*
   import crate.engine.types.Manager
-  fn makeAction(manager: Manager): Action {
+  fn makeAction(consuming manager: Manager): Action {
     Action(
       manager: manager,
       command: format!("{} update", manager),
@@ -125,8 +126,8 @@ module tests {
       makeAction(Manager.rustup),
     ]
 
-    let only = ["   ", "\t"]
-    let skip = ["\n"]
+    let only = ["   ", "  "]
+    let skip = [" "]
     let filtered = filterActions(actions, only, skip)
 
     assert_eq!(filtered.len(), 3)

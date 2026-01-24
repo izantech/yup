@@ -25,7 +25,7 @@ extension Config {
     toml.fromStr(&content).ok()
   }
   /// Save config to disk
-  public consuming fn save(): Result<()> {
+  public fn save(): Result<()> {
     let path = match Config.path() {
       Some(p) -> p
       null -> return Err(anyhow!("Cannot determine config path"))
@@ -40,5 +40,5 @@ extension Config {
   /// Check if config file exists
   public static fn exists(): bool { Config.path().map { it.exists() }.unwrapOr(false) }
   /// Get enabled managers as a HashSet
-  public consuming fn enabledManagerSet(): HashSet<Manager> { self.enabledManagers.iter().copied().collect() }
+  public fn enabledManagerSet(): HashSet<Manager> { self.enabledManagers.iter().copied().collect() }
 }

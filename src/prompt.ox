@@ -50,7 +50,7 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   if actions.isEmpty() {
     println!("  (no actions available for selected managers)\n")
   } else {
-    for action in actions {
+    for action in actions.iter() {
       let sudoMarker = if action.requiresPrivilege { " [sudo]" } else { "" }
       println!("  {} - {}{}", action.command, action.description, sudoMarker)
     }

@@ -111,7 +111,7 @@ async fn run_without_config(args: &Cli) -> anyhow::Result<()> {
     let all_actions = get_actions_for_scan(&report);
 
     // Apply CLI filters
-    let actions = filter_actions(&all_actions, &args.only, &args.skip);
+    let actions = filter_actions(&all_actions, args.only.clone(), args.skip.clone());
 
     if actions.is_empty() {
         println!("No actions to run.");
@@ -127,7 +127,7 @@ async fn run_status(args: &Cli) -> anyhow::Result<()> {
     let all_actions = get_check_actions_for_scan(&report);
 
     // Apply CLI filters
-    let actions = filter_actions(&all_actions, &args.only, &args.skip);
+    let actions = filter_actions(&all_actions, args.only.clone(), args.skip.clone());
 
     if actions.is_empty() {
         println!("No status checks available for detected managers.");
@@ -175,7 +175,7 @@ async fn run_with_config(args: &Cli) -> anyhow::Result<()> {
     let actions = prompt::get_filtered_actions(&config, &report);
 
     // Apply CLI overrides using filter_actions
-    let actions = filter_actions(&actions, &args.only, &args.skip);
+    let actions = filter_actions(&actions, args.only.clone(), args.skip.clone());
 
     if actions.is_empty() {
         println!("No actions to run with current configuration.");

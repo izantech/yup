@@ -8,11 +8,11 @@ public struct CargoManager
 
 /// Check if cargo-update is installed
 fn isCargoUpdateAvailable(): bool {
-  Command("cargo")
+  Command.new("cargo")
     .args(["install", "--list"])
     .output()
     .map { output ->
-      let stdout = String.fromUtf8Lossy(output.stdout)
+      let stdout = String.fromUtf8Lossy(output.stdout.asRef())
       stdout.contains("cargo-update")
     }
     .unwrapOr(false)

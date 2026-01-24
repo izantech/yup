@@ -15,7 +15,7 @@ public fn scan(): ScanReport {
     .filterMap { manager ->
       let pkgManager = createManager(manager)?
       let hasActions = !pkgManager.updateActions().isEmpty() || !pkgManager.upgradeActions().isEmpty()
-      if hasActions { manager } else { null }
+      if hasActions { Some(manager) } else { null }
     }
     .collect()
 
@@ -52,7 +52,7 @@ module tests {
 
     // CRITICAL REGRESSION TEST: actionableManagers must be a subset of availableManagers
     for manager in report.actionableManagers {
-      assert!(report.availableManagers.contains(manager), "Actionable manager {} must be in availableManagers", manager)
+      assert!(report.availableManagers.contains(&manager), "Actionable manager {} must be in availableManagers", manager)
     }
   }
   @[test]
@@ -62,7 +62,7 @@ module tests {
     // All actionable managers must have implementations (createManager returns non-null)
     for manager in report.actionableManagers {
       let pkgManager = createManager(manager)
-      assert!(pkgManager != null, "Actionable manager {} must have an implementation", manager)
+      assert!(pkgManager.isSome(), "Actionable manager {} must have an implementation", manager)
     }
   }
   @[test]
@@ -84,7 +84,7 @@ module tests {
     // All available managers must have their binaries in PATH
     for manager in report.availableManagers {
       let binaryName = manager.asRef().toLowercase()
-      let inPath = which(binaryName).isOk()
+      let inPath = which(&binaryName).isOk()
 
       assert!(inPath, "Available manager {} binary '{}' must be in PATH", manager, binaryName)
     }
@@ -96,7 +96,7 @@ module tests {
 
     // All returned actions must be from managers that are in availableManagers
     for action in actions {
-      assert!(report.availableManagers.contains(action.manager), "Action manager {} must be in availableManagers", action.manager)
+      assert!(report.availableManagers.contains(&action.manager), "Action manager {} must be in availableManagers", action.manager)
     }
   }
   @[test]
