@@ -2,14 +2,14 @@
 
 ## Oxide Migration Status
 
-This project has been fully migrated to a hybrid Rust/Oxide codebase. The Oxide transpiler converts `.ox` files to Rust in the `oxide-gen/` directory.
+This project has been fully migrated to Oxide. The Oxide transpiler converts `.ox` files to Rust in the `oxide-gen/` directory.
 
 **Migration Complete:**
 - ✅ Phase 1: Infrastructure setup
 - ✅ Phase 2: Core types and engine modules
 - ✅ Phase 3: All 20 manager implementations converted to Oxide
 - ✅ Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox, config.ox, filter.ox)
-- ✅ Phase 5: CLI & Main kept in Rust (complex macro support)
+- ✅ Phase 5: CLI & Main migrated to Oxide
 - ✅ Phase 6: Testing & Verification
 
 **Build Commands:**
@@ -20,14 +20,14 @@ cargo oxide test               # Run tests
 cargo oxide run -- --dry-run   # Test the binary
 ```
 
-Source files (both `.ox` and `.rs`) live in `src/`. The Oxide transpiler generates `oxide-gen/` with the final Rust code.
+Source files (`.ox`) live in `src/`. The Oxide transpiler generates `oxide-gen/` with the final Rust code.
 
 ## Project Structure
 
 ```
-src/                          # Source files (Oxide + Rust)
-├── main.rs                   # Entry point, CLI flow (RUST - tokio/clap macros)
-├── cli.rs                    # Clap CLI definitions (RUST - derive macros)
+src/                          # Source files (Oxide)
+├── main.ox                   # Entry point, CLI flow (OXIDE)
+├── cli.ox                    # Clap CLI definitions (OXIDE)
 ├── config.ox                 # Config loading/saving (OXIDE)
 ├── prompt.ox                 # Interactive wizard (OXIDE)
 ├── sudo.ox                   # Sudo credential management (OXIDE)
@@ -42,17 +42,15 @@ src/                          # Source files (Oxide + Rust)
 
 oxide-gen/                    # Generated output (do not edit)
 └── src/
-    ├── main.rs               # Copied from src/
-    ├── cli.rs                # Copied from src/
+    ├── main.rs               # Transpiled from src/main.ox
+    ├── cli.rs                # Transpiled from src/cli.ox
     ├── oxide_helpers.rs      # Oxide runtime helpers
     └── *.rs                  # Transpiled from *.ox files
 ```
 
-### Files Kept in Rust
+### Rust Output
 
-Two files in `src/` remain in Rust due to Oxide transpiler limitations with complex macros:
-- **main.rs**: `#[tokio::main]` async runtime and clap derives
-- **cli.rs**: Clap command-line argument derives
+`oxide-gen/` contains the generated Rust output. Do not edit these files directly.
 
 ## Toolchain
 
@@ -63,11 +61,11 @@ The repo pins a Rust toolchain via `rust-toolchain.toml`. With rustup installed,
 
 ### Core Flow
 
-1. **CLI parsing** (`cli.rs`): Parse arguments with clap
-2. **Mode dispatch** (`main.rs`): Route to wizard, config-based run, or status check
+1. **CLI parsing** (`cli.ox`): Parse arguments with clap
+2. **Mode dispatch** (`main.ox`): Route to wizard, config-based run, or status check
 3. **System scan** (`scan.ox`): Detect installed tools via `which`
 4. **Action generation** (`managers/*.ox`): Create update/upgrade/check actions
-5. **Execution** (`main.rs`): Run actions with progress bar
+5. **Execution** (`main.ox`): Run actions with progress bar
 
 ### Key Types
 
