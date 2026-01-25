@@ -9,7 +9,7 @@ import toml
 import crate.engine.Manager
 
 /// User configuration for yup
-@[derive(Debug , Clone , Serialize , Deserialize , Default)]
+@[derive(Debug, Clone, Serialize, Deserialize, Default)]
 public struct Config(enabledManagers: Array<Manager>)
 
 extension Config {

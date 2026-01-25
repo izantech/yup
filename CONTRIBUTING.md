@@ -62,8 +62,8 @@ cargo oxide clippy
 
 ### Conventions
 
-- Source code is written in Oxide (`.ox` files), transpiled to Rust
-- Two files remain in Rust: `main.rs` and `cli.rs` (complex macro support)
+- All source code is written in Oxide (`.ox` files), transpiled to Rust
+- 100% Oxide codebase - no Rust source files remaining
 - Use `anyhow::Result` for error handling
 - Use `tracing` macros for logging (`debug!`, `info!`)
 - Platform-specific code uses `@[cfg(target_os = "...")]` in Oxide
@@ -72,7 +72,7 @@ cargo oxide clippy
 
 1. Fork the repository and create a feature branch
 2. Make your changes
-3. Run `cargo fmt && cargo clippy && cargo test`
+3. Run `cargo oxide fmt && cargo oxide clippy && cargo oxide test`
 4. Submit a PR against `main`
 5. Use conventional commit prefixes: `feat:`, `fix:`, `docs:`, `refactor:`
 

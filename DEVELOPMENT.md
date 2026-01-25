@@ -2,7 +2,7 @@
 
 ## Oxide Migration Status
 
-This project has been fully migrated to Oxide. The Oxide transpiler converts `.ox` files to Rust in the `oxide-gen/` directory.
+This project has been **fully migrated to Oxide**. The Oxide transpiler converts `.ox` files to Rust in the `oxide-gen/` directory.
 
 **Migration Complete:**
 - ✅ Phase 1: Infrastructure setup
@@ -11,6 +11,8 @@ This project has been fully migrated to Oxide. The Oxide transpiler converts `.o
 - ✅ Phase 4: Core business logic (scan.ox, prompt.ox, sudo.ox, config.ox, filter.ox)
 - ✅ Phase 5: CLI & Main migrated to Oxide
 - ✅ Phase 6: Testing & Verification
+
+**Status:** 30 source files in Oxide (100% migration complete)
 
 **Build Commands:**
 ```bash

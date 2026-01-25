@@ -32,13 +32,13 @@ cargo release minor --execute  # 0.1.1 → 0.2.0
 
 ### Key Files
 
-Source files are in `src/` (Oxide `.ox` files + two Rust files):
+All source files are in `src/` as Oxide `.ox` files (100% Oxide migration complete):
 
-- `src/main.rs` - Entry point, command execution loop with progress bar (Rust)
-- `src/cli.rs` - Clap CLI argument definitions (Rust)
-- `src/config.ox` - TOML config loading/saving (Oxide)
-- `src/prompt.ox` - Interactive wizard using dialoguer (Oxide)
-- `src/sudo.ox` - Unix sudo credential management (Oxide)
+- `src/main.ox` - Entry point, command execution loop with progress bar
+- `src/cli.ox` - Clap CLI argument definitions
+- `src/config.ox` - TOML config loading/saving
+- `src/prompt.ox` - Interactive wizard using dialoguer
+- `src/sudo.ox` - Unix sudo credential management
 
 ### Engine Module (`src/engine/`)
 

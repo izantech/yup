@@ -1,11 +1,11 @@
 import clap.{ Parser, Subcommand }
 
-@[derive(Parser , Debug)]
+@[derive(Parser, Debug)]
 @[command(
   name = "yup",
   version,
   about = "Safe, cross-platform updater for development tools",
-  long_about = null
+  long_about = null,
 )]
 public struct Cli(
   @[command(subcommand)]
@@ -36,7 +36,8 @@ public struct Cli(
   verbose: Bool,
 )
 
-@[derive(Subcommand , Debug)]
+/// Show command output during execution
+@[derive(Subcommand, Debug)]
 public enum Command {
   /// Re-run the configuration wizard
   case config
