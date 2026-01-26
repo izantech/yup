@@ -27,7 +27,8 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
   let managerNames: Array<String> = managers.iter().map { "$it" }.collect()
   let defaults: Array<Bool> = managers.iter().map { true }.collect()
 
-  let selections = MultiSelect.with_theme(&ColorfulTheme.default())
+  let selections = MultiSelect
+    .with_theme(&ColorfulTheme.default())
     .with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)")
     .items(managerNames)
     .defaults(&defaults)
@@ -59,12 +60,14 @@ public fn runWizard(report: ScanReport): Result<(Config, bool)> {
 
   // Confirm execution
   let shouldExecute = if actions.isEmpty() {
-    Confirm.with_theme(&ColorfulTheme.default())
+    Confirm
+      .with_theme(&ColorfulTheme.default())
       .with_prompt("Save this configuration?")
       .default(true)
       .interact()?
   } else {
-    Confirm.with_theme(&ColorfulTheme.default())
+    Confirm
+      .with_theme(&ColorfulTheme.default())
       .with_prompt("Save configuration and run these commands?")
       .default(true)
       .interact()?

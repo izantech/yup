@@ -27,8 +27,8 @@ extension Config {
   /// Save config to disk
   public fn save(): Result<()> {
     let path = match Config.path() {
-      Some(p) -> p
-      null -> return Err(anyhow!("Cannot determine config path"))
+      Some(p) -> p,
+      null -> return Err(anyhow!("Cannot determine config path")),
     }
     if let parent = path.parent() {
       std.fs.createDirAll(parent)?

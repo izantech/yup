@@ -36,7 +36,8 @@ fn setupFileLogging(): PathBuf? {
   // Create log directory if it doesn't exist
   std.fs.createDirAll(logDir).ok()?
 
-  let fileAppender = RollingFileAppender.builder()
+  let fileAppender = RollingFileAppender
+    .builder()
     .rotation(Rotation.DAILY)
     .filenamePrefix("yup")
     .filenameSuffix("log")
@@ -68,10 +69,10 @@ async fn asyncMain(): Result<()> {
     Command.config -> {
       // Force re-run wizard
       await runWizardFlow(&args)?
-    }
+    },
     Command.log -> {
       showLastLog()?
-    }
+    },
     null -> {
       // Check for --status flag first
       if args.status {
@@ -86,7 +87,7 @@ async fn asyncMain(): Result<()> {
         // First run: show wizard
         await runWizardFlow(&args)?
       }
-    }
+    },
   }
 
   Ok(())
@@ -160,9 +161,9 @@ async fn runStatus(args: &Cli): Result<()> {
 
     let result = await executeCommand(cmd, OutputMode.streaming)
     match result {
-      Ok(true) -> ()
-      Ok(false) -> println!("  Error: Command failed\n")
-      Err(e) -> println!("  Error: $e\n")
+      Ok(true) -> (),
+      Ok(false) -> println!("  Error: Command failed\n"),
+      Err(e) -> println!("  Error: $e\n"),
     }
     println!()
   }
@@ -244,7 +245,8 @@ async fn runActions(actions: Array<Action>, args: &Cli): Result<()> {
   // Create progress bar
   let progress = ProgressBar.new(total as UInt64)
   progress.setStyle(
-    ProgressStyle.defaultBar()
+    ProgressStyle
+      .defaultBar()
       .template("{spinner:.green} [{bar:25.cyan/dim}] {pos}/{len} {msg}")
       .expect("valid progress bar template")
       .progressChars("=> "),
@@ -276,7 +278,7 @@ async fn runActions(actions: Array<Action>, args: &Cli): Result<()> {
       Ok(true) -> {
         successCount += 1
         if args.verbose { progress.suspend { println!("      -> Done ({:.1}s)", elapsed.asSecsF64()) } }
-      }
+      },
       Ok(false) -> {
         failedActions.push(
           FailedAction(
@@ -286,13 +288,13 @@ async fn runActions(actions: Array<Action>, args: &Cli): Result<()> {
           ),
         )
         if args.verbose { progress.suspend { println!("      -> FAILED ({:.1}s)", elapsed.asSecsF64()) } }
-      }
+      },
       Err(e) -> {
         failedActions.push(
           FailedAction(index: actionIndex, command: action.command.clone(), error: e.toString()),
         )
         if args.verbose { progress.suspend { println!("      -> ERROR: $e") } }
-      }
+      },
     }
 
     progress.inc(1)
@@ -354,12 +356,12 @@ async fn executeCommand(cmdStr: str, mode: OutputMode): Result<Bool> {
   var streamOutput = true
 
   match mode {
-    OutputMode.streaming -> ()
+    OutputMode.streaming -> (),
     OutputMode.progress(progress: p, verbose: v) -> {
       progress = p
       verbose = v
       streamOutput = false
-    }
+    },
   }
 
   let stdoutFuture = async {

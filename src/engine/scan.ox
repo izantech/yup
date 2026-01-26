@@ -10,7 +10,8 @@ public fn scan(): ScanReport {
   let availableManagers = Manager.iter().filter { which(it.asRef().toLowercase()).isOk() }.collect()
 
   // Compute actionable managers (those with implementations AND actions)
-  let actionableManagers = Manager.iter()
+  let actionableManagers = Manager
+    .iter()
     .filter { which(it.asRef().toLowercase()).isOk() }
     .filterMap { manager ->
       let pkgManager = createManager(manager)?
