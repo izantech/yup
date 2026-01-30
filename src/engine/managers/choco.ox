@@ -13,7 +13,7 @@ extension ChocoManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.choco,
+        manager: Manager.Choco,
         command: "choco upgrade all -y",
         description: "Upgrade all packages",
         requiresPrivilege: true,
@@ -23,7 +23,7 @@ extension ChocoManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.choco,
+        manager: Manager.Choco,
         command: "choco outdated",
         description: "Check for outdated packages",
         requiresPrivilege: false,

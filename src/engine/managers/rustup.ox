@@ -9,7 +9,7 @@ extension RustupManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.rustup,
+        manager: Manager.Rustup,
         command: "rustup update",
         description: "Update all installed Rust toolchains",
         requiresPrivilege: false,
@@ -23,7 +23,7 @@ extension RustupManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.rustup,
+        manager: Manager.Rustup,
         command: "rustup check",
         description: "Check for Rust toolchain updates",
         requiresPrivilege: false,

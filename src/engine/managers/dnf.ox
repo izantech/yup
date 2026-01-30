@@ -13,13 +13,13 @@ extension DnfManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.dnf,
+        manager: Manager.Dnf,
         command: "dnf upgrade -y",
         description: "Upgrade all packages",
         requiresPrivilege: true,
       ),
       Action(
-        manager: Manager.dnf,
+        manager: Manager.Dnf,
         command: "dnf autoremove -y",
         description: "Remove unused dependencies",
         requiresPrivilege: true,
@@ -29,7 +29,7 @@ extension DnfManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.dnf,
+        manager: Manager.Dnf,
         command: "dnf check-update",
         description: "Check for available updates",
         requiresPrivilege: false,

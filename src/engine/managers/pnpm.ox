@@ -9,7 +9,7 @@ extension PnpmManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.pnpm,
+        manager: Manager.Pnpm,
         command: "pnpm self-update",
         description: "Update pnpm itself",
         requiresPrivilege: false,
@@ -19,7 +19,7 @@ extension PnpmManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.pnpm,
+        manager: Manager.Pnpm,
         command: "pnpm update -g",
         description: "Update global pnpm packages",
         requiresPrivilege: false,
@@ -29,7 +29,7 @@ extension PnpmManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.pnpm,
+        manager: Manager.Pnpm,
         command: "pnpm outdated -g",
         description: "Check for outdated global pnpm packages",
         requiresPrivilege: false,

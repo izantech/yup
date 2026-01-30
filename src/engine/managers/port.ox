@@ -9,7 +9,7 @@ extension PortManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.port,
+        manager: Manager.Port,
         command: "port selfupdate",
         description: "Update MacPorts and port definitions",
         requiresPrivilege: true,
@@ -19,7 +19,7 @@ extension PortManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.port,
+        manager: Manager.Port,
         command: "port upgrade outdated",
         description: "Upgrade outdated ports",
         requiresPrivilege: true,
@@ -29,7 +29,7 @@ extension PortManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.port,
+        manager: Manager.Port,
         command: "port outdated",
         description: "Check for outdated ports",
         requiresPrivilege: false,

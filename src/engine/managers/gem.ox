@@ -9,7 +9,7 @@ extension GemManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.gem,
+        manager: Manager.Gem,
         command: "gem update --system",
         description: "Update RubyGems itself",
         requiresPrivilege: false,
@@ -19,7 +19,7 @@ extension GemManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.gem,
+        manager: Manager.Gem,
         command: "gem update",
         description: "Update all installed gems",
         requiresPrivilege: false,
@@ -29,7 +29,7 @@ extension GemManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.gem,
+        manager: Manager.Gem,
         command: "gem outdated",
         description: "Check for outdated Ruby gems",
         requiresPrivilege: false,

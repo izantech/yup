@@ -13,7 +13,7 @@ extension FlatpakManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.flatpak,
+        manager: Manager.Flatpak,
         command: "flatpak update -y",
         description: "Update all Flatpak applications",
         requiresPrivilege: false,
@@ -23,7 +23,7 @@ extension FlatpakManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.flatpak,
+        manager: Manager.Flatpak,
         command: "flatpak remote-ls --updates",
         description: "Check for available updates",
         requiresPrivilege: false,

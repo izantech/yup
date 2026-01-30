@@ -13,7 +13,7 @@ extension SnapManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.snap,
+        manager: Manager.Snap,
         command: "snap refresh",
         description: "Refresh all Snap packages",
         requiresPrivilege: true,
@@ -23,7 +23,7 @@ extension SnapManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.snap,
+        manager: Manager.Snap,
         command: "snap refresh --list",
         description: "Check for available updates",
         requiresPrivilege: false,

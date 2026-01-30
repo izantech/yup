@@ -45,53 +45,53 @@ module tests {
   @[test]
   fn testFilterOnly() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.rustup),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Rustup),
     ]
 
     let only = ["brew", "rustup"]
     let filtered = filterActions(actions, only, null)
 
     assert_eq!(filtered.len(), 2)
-    assert!(filtered.iter().any { it.manager == Manager.brew })
-    assert!(filtered.iter().any { it.manager == Manager.rustup })
+    assert!(filtered.iter().any { it.manager == Manager.Brew })
+    assert!(filtered.iter().any { it.manager == Manager.Rustup })
   }
   @[test]
   fn testFilterSkip() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.pipx),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Pipx),
     ]
 
     let skip = ["npm", "pipx"]
     let filtered = filterActions(actions, null, skip)
 
     assert_eq!(filtered.len(), 1)
-    assert_eq!(filtered[0].manager, Manager.brew)
+    assert_eq!(filtered[0].manager, Manager.Brew)
   }
   @[test]
   fn testFilterCaseInsensitiveAndTrimmed() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.rustup),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Rustup),
     ]
 
     let only = [" BREW ", "RUSTUP"]
     let filtered = filterActions(actions, only, null)
 
     assert_eq!(filtered.len(), 2)
-    assert!(filtered.iter().any { it.manager == Manager.brew })
-    assert!(filtered.iter().any { it.manager == Manager.rustup })
+    assert!(filtered.iter().any { it.manager == Manager.Brew })
+    assert!(filtered.iter().any { it.manager == Manager.Rustup })
   }
   @[test]
   fn testFilterOnlyAndSkipCombined() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.rustup),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Rustup),
     ]
 
     let only = ["brew", "npm"]
@@ -99,14 +99,14 @@ module tests {
     let filtered = filterActions(actions, only, skip)
 
     assert_eq!(filtered.len(), 1)
-    assert_eq!(filtered[0].manager, Manager.brew)
+    assert_eq!(filtered[0].manager, Manager.Brew)
   }
   @[test]
   fn testFilterEmptyListsNoop() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.rustup),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Rustup),
     ]
 
     let only: Array<String> = []
@@ -114,16 +114,16 @@ module tests {
     let filtered = filterActions(actions, only, skip)
 
     assert_eq!(filtered.len(), 3)
-    assert!(filtered.iter().any { it.manager == Manager.brew })
-    assert!(filtered.iter().any { it.manager == Manager.npm })
-    assert!(filtered.iter().any { it.manager == Manager.rustup })
+    assert!(filtered.iter().any { it.manager == Manager.Brew })
+    assert!(filtered.iter().any { it.manager == Manager.Npm })
+    assert!(filtered.iter().any { it.manager == Manager.Rustup })
   }
   @[test]
   fn testFilterWhitespaceOnlyEntriesNoop() {
     let actions = [
-      makeAction(Manager.brew),
-      makeAction(Manager.npm),
-      makeAction(Manager.rustup),
+      makeAction(Manager.Brew),
+      makeAction(Manager.Npm),
+      makeAction(Manager.Rustup),
     ]
 
     let only = ["   ", "  "]
@@ -131,8 +131,8 @@ module tests {
     let filtered = filterActions(actions, only, skip)
 
     assert_eq!(filtered.len(), 3)
-    assert!(filtered.iter().any { it.manager == Manager.brew })
-    assert!(filtered.iter().any { it.manager == Manager.npm })
-    assert!(filtered.iter().any { it.manager == Manager.rustup })
+    assert!(filtered.iter().any { it.manager == Manager.Brew })
+    assert!(filtered.iter().any { it.manager == Manager.Npm })
+    assert!(filtered.iter().any { it.manager == Manager.Rustup })
   }
 }

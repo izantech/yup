@@ -9,7 +9,7 @@ extension AptManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.apt,
+        manager: Manager.Apt,
         command: "apt update",
         description: "Update package index",
         requiresPrivilege: true,
@@ -19,13 +19,13 @@ extension AptManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.apt,
+        manager: Manager.Apt,
         command: "apt upgrade -y",
         description: "Upgrade installed packages",
         requiresPrivilege: true,
       ),
       Action(
-        manager: Manager.apt,
+        manager: Manager.Apt,
         command: "apt autoremove -y",
         description: "Remove unused dependencies",
         requiresPrivilege: true,
@@ -35,7 +35,7 @@ extension AptManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.apt,
+        manager: Manager.Apt,
         command: "apt list --upgradable",
         description: "Check for available updates",
         requiresPrivilege: false,

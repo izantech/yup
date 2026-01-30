@@ -9,7 +9,7 @@ extension NpmManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.npm,
+        manager: Manager.Npm,
         command: "npm install -g npm",
         description: "Update npm itself",
         requiresPrivilege: false,
@@ -19,7 +19,7 @@ extension NpmManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.npm,
+        manager: Manager.Npm,
         command: "npm update -g",
         description: "Update global npm packages",
         requiresPrivilege: false,
@@ -29,7 +29,7 @@ extension NpmManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.npm,
+        manager: Manager.Npm,
         command: "npm outdated -g",
         description: "Check for outdated global npm packages",
         requiresPrivilege: false,

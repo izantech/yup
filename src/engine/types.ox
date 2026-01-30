@@ -22,26 +22,26 @@ import strum.{ AsRefStr, Display, EnumCount, EnumIter, EnumString }
 )]
 @[strum(ascii_case_insensitive)]
 public enum Manager {
-  case brew
-  case port
-  case apt
-  case dnf
-  case pacman
-  case flatpak
-  case snap
-  case winget
-  case choco
-  case scoop
-  case mas
-  case softwareupdate
-  case mise
-  case conda
-  case npm
-  case pnpm
-  case pipx
-  case cargo
-  case rustup
-  case gem
+  Brew,
+  Port,
+  Apt,
+  Dnf,
+  Pacman,
+  Flatpak,
+  Snap,
+  Winget,
+  Choco,
+  Scoop,
+  Mas,
+  SoftwareUpdate,
+  Mise,
+  Conda,
+  Npm,
+  Pnpm,
+  Pipx,
+  Cargo,
+  Rustup,
+  Gem,
 }
 
 /// A single discrete action to be performed by a package manager.

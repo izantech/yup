@@ -9,7 +9,7 @@ extension CondaManager: PackageManager {
   fn updateActions(): Array<Action> {
     [
       Action(
-        manager: Manager.conda,
+        manager: Manager.Conda,
         command: "conda update -n base conda -y",
         description: "Update conda itself",
         requiresPrivilege: false,
@@ -20,7 +20,7 @@ extension CondaManager: PackageManager {
     // Upgrading all base packages can break environments
     [
       Action(
-        manager: Manager.conda,
+        manager: Manager.Conda,
         command: "conda update -n base --all -y",
         description: "Update all packages in base environment",
         requiresPrivilege: false,
@@ -30,7 +30,7 @@ extension CondaManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.conda,
+        manager: Manager.Conda,
         command: "conda list --outdated",
         description: "Check for outdated packages",
         requiresPrivilege: false,

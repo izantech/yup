@@ -13,7 +13,7 @@ extension WingetManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.winget,
+        manager: Manager.Winget,
         command: "winget upgrade --all --silent --disable-interactivity --accept-package-agreements --accept-source-agreements",
         description: "Upgrade all packages",
         requiresPrivilege: false,
@@ -23,7 +23,7 @@ extension WingetManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.winget,
+        manager: Manager.Winget,
         command: "winget list --upgrade-available",
         description: "Check for available upgrades",
         requiresPrivilege: false,

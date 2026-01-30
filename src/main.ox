@@ -66,11 +66,11 @@ async fn asyncMain(): Result<()> {
   let args = Cli.parse()
 
   match args.command {
-    Command.config -> {
+    Command.Config -> {
       // Force re-run wizard
       await runWizardFlow(&args)?
     },
-    Command.log -> {
+    Command.Log -> {
       showLastLog()?
     },
     null -> {
@@ -159,7 +159,7 @@ async fn runStatus(args: &Cli): Result<()> {
       action.command.clone()
     }
 
-    let result = await executeCommand(cmd, OutputMode.streaming)
+    let result = await executeCommand(cmd, OutputMode.Streaming)
     match result {
       Ok(true) -> (),
       Ok(false) -> println!("  Error: Command failed\n"),
@@ -270,7 +270,7 @@ async fn runActions(actions: Array<Action>, args: &Cli): Result<()> {
     // Execute command with progress integration
     let result = await executeCommand(
       cmdToRun,
-      OutputMode.progress(progress: progress.clone(), verbose: args.verbose),
+      OutputMode.Progress(progress: progress.clone(), verbose: args.verbose),
     )
 
     let elapsed = start.elapsed()
@@ -337,8 +337,8 @@ fn createShellCommand(cmdStr: str): ProcessCommand {
 }
 
 enum OutputMode {
-  case streaming
-  case progress(progress: ProgressBar, verbose: Bool)
+  Streaming,
+  Progress(progress: ProgressBar, verbose: Bool),
 }
 
 struct FailedAction(index: UIntSize, command: String, error: String)
@@ -356,8 +356,8 @@ async fn executeCommand(cmdStr: str, mode: OutputMode): Result<Bool> {
   var streamOutput = true
 
   match mode {
-    OutputMode.streaming -> (),
-    OutputMode.progress(progress: p, verbose: v) -> {
+    OutputMode.Streaming -> (),
+    OutputMode.Progress(progress: p, verbose: v) -> {
       progress = p
       verbose = v
       streamOutput = false
@@ -439,9 +439,7 @@ async fn ensureSudoCredentials(needsSudo: Bool): Result<()> {
 }
 
 fn showLastLog(): Result<()> {
-  guard let projDirs = ProjectDirs.from("", "", "yup") else {
-    return Err(anyhow!("Cannot determine log directory"))
-  }
+  guard let projDirs = ProjectDirs.from("", "", "yup") else { return Err(anyhow!("Cannot determine log directory")) }
   let logDir = projDirs.dataLocalDir()
 
   // Find the most recent log file

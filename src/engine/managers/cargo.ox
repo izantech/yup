@@ -25,7 +25,7 @@ extension CargoManager: PackageManager {
     if isCargoUpdateAvailable() {
       [
         Action(
-          manager: Manager.cargo,
+          manager: Manager.Cargo,
           command: "cargo install-update -a",
           description: "Update all cargo-installed binaries",
           requiresPrivilege: false,
@@ -39,7 +39,7 @@ extension CargoManager: PackageManager {
     if isCargoUpdateAvailable() {
       [
         Action(
-          manager: Manager.cargo,
+          manager: Manager.Cargo,
           command: "cargo install-update -l",
           description: "Check for outdated cargo binaries",
           requiresPrivilege: false,

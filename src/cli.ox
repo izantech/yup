@@ -40,7 +40,7 @@ public struct Cli(
 @[derive(Subcommand, Debug)]
 public enum Command {
   /// Re-run the configuration wizard
-  case config
+  Config,
   /// Show the last run log
-  case log
+  Log,
 }

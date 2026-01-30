@@ -13,7 +13,7 @@ extension MasManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.mas,
+        manager: Manager.Mas,
         command: "mas upgrade",
         description: "Upgrade Mac App Store apps",
         requiresPrivilege: true,
@@ -23,7 +23,7 @@ extension MasManager: PackageManager {
   fn checkActions(): Array<Action> {
     [
       Action(
-        manager: Manager.mas,
+        manager: Manager.Mas,
         command: "mas outdated",
         description: "Check for outdated Mac App Store apps",
         requiresPrivilege: false,

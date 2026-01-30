@@ -14,7 +14,7 @@ extension PacmanManager: PackageManager {
   fn upgradeActions(): Array<Action> {
     [
       Action(
-        manager: Manager.pacman,
+        manager: Manager.Pacman,
         command: "pacman -Syu --noconfirm",
         description: "Sync and upgrade all packages",
         requiresPrivilege: true,
@@ -25,7 +25,7 @@ extension PacmanManager: PackageManager {
     if which("checkupdates").isOk() {
       [
         Action(
-          manager: Manager.pacman,
+          manager: Manager.Pacman,
           command: "checkupdates",
           description: "Check for available updates",
           requiresPrivilege: false,

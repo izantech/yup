@@ -14,7 +14,7 @@ extension PipxManager: PackageManager {
     // pipx upgrade-all is safe because each app is in its own isolated venv
     [
       Action(
-        manager: Manager.pipx,
+        manager: Manager.Pipx,
         command: "pipx upgrade-all",
         description: "Upgrade all pipx-installed packages",
         requiresPrivilege: false,
