@@ -155,7 +155,7 @@ public fn create_manager(manager: &Manager): Box<dyn PackageManager>? {
     match manager {
         // ... existing cases
         Manager.MyManager -> Some(Box(MyManagerManager) as Box<dyn PackageManager>)
-        else -> None
+        _ -> None
     }
 }
 ```
@@ -242,7 +242,7 @@ git push origin v0.1.0
 | `pub fn` | `public fn` |
 | `#[derive(...)]` | `@[derive(...)]` |
 | `impl Trait for T` | `extension T: Trait` |
-| `match x { _ => }` | `match x { else -> }` |
+| `match x { _ => }` | `match x { _ -> }` |
 | `\|x\| expr` | `{ x -> expr }` |
 | `use crate::mod` | `import crate.mod` |
 | `mod foo;` | `external module foo` |
