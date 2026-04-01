@@ -131,3 +131,19 @@ pub fn apply_brew_greedy(actions: Vec<Action>) -> Vec<Action> {
         })
         .collect()
 }
+
+/// Append `--yes` to any `mise self-update` action that doesn't already have it.
+pub fn apply_mise_yes(actions: Vec<Action>) -> Vec<Action> {
+    actions
+        .into_iter()
+        .map(|mut a| {
+            if a.manager == Manager::Mise
+                && a.command.starts_with("mise self-update")
+                && !a.command.contains("--yes")
+            {
+                a.command.push_str(" --yes");
+            }
+            a
+        })
+        .collect()
+}

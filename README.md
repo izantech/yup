@@ -104,8 +104,11 @@ yup log
 
 On first run, `yup` shows an interactive wizard to:
 1. Select which detected managers to update
-2. Preview the commands that will run
-3. Save configuration and execute
+2. Configure manager-specific options (brew `--greedy`, mise `--yes`)
+3. Preview the commands that will run
+4. Save configuration and execute
+
+Re-running `yup config` loads your existing config and pre-selects your previously enabled managers.
 
 Configuration is stored at:
 - **macOS:** `~/Library/Application Support/yup/config.toml`
@@ -124,6 +127,27 @@ greedy = true
 ```
 
 This includes auto-updating casks in the upgrade. The `--greedy` CLI flag overrides this setting per-run.
+
+### Mise Self-Update Confirmation
+
+By default, `yup` passes `--yes` to `mise self-update` to skip the confirmation prompt. You can disable this in the `[mise]` config section:
+
+```toml
+[mise]
+yes = false
+```
+
+### Full Config Example
+
+```toml
+enabled_managers = ["brew", "mise", "cargo"]
+
+[brew]
+greedy = false
+
+[mise]
+yes = true
+```
 
 ## Supported Managers
 

@@ -2,12 +2,15 @@ use std::collections::HashSet;
 
 use dialoguer::{Confirm, MultiSelect, theme::ColorfulTheme};
 
-use crate::config::Config;
+use crate::config::{BrewConfig, Config, MiseConfig};
 use crate::engine::{Manager, ScanReport, get_actions_for_scan};
 
 /// Run the configuration wizard
 /// Returns (Config, should_execute: bool)
-pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
+pub fn run_wizard(
+    report: &ScanReport,
+    existing: Option<&Config>,
+) -> anyhow::Result<(Config, bool)> {
     println!("\n=== yup - Development Tool Updater ===\n");
 
     // Get actionable managers sorted (only those with actual update/upgrade actions)
@@ -24,7 +27,12 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
 
     // Multi-select for managers
     let manager_names: Vec<String> = managers.iter().map(|m| m.to_string()).collect();
-    let defaults: Vec<bool> = vec![true; managers.len()];
+    let defaults: Vec<bool> = if let Some(cfg) = existing {
+        let enabled = cfg.enabled_manager_set();
+        managers.iter().map(|m| enabled.contains(m)).collect()
+    } else {
+        vec![true; managers.len()]
+    };
 
     let selections = MultiSelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Select managers to update (Space: toggle, a: toggle all, Enter: confirm)")
@@ -39,10 +47,33 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
 
     let enabled_managers: Vec<Manager> = selections.iter().map(|&i| managers[i]).collect();
 
+    // Prompt for brew --greedy if Brew is selected
+    let brew_greedy = if enabled_managers.contains(&Manager::Brew) {
+        Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Pass --greedy to brew upgrade? (include auto-updating casks)")
+            .default(existing.map(|c| c.brew.greedy).unwrap_or(false))
+            .interact()?
+    } else {
+        false
+    };
+
+    // Prompt for mise --yes if Mise is selected
+    let mise_yes = if enabled_managers.contains(&Manager::Mise) {
+        Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Pass --yes to mise self-update? (skip confirmation)")
+            .default(existing.map(|c| c.mise.yes).unwrap_or(true))
+            .interact()?
+    } else {
+        true
+    };
+
     // Build config
     let config = Config {
         enabled_managers: enabled_managers.clone(),
-        ..Config::default()
+        brew: BrewConfig {
+            greedy: brew_greedy,
+        },
+        mise: MiseConfig { yes: mise_yes },
     };
 
     // Preview commands

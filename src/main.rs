@@ -14,7 +14,7 @@ use clap::Parser;
 use cli::{Cli, Command};
 use config::Config;
 use directories::ProjectDirs;
-use engine::managers::apply_brew_greedy;
+use engine::managers::{apply_brew_greedy, apply_mise_yes};
 use engine::{filter_actions, get_actions_for_scan, get_check_actions_for_scan, scan};
 use indicatif::{ProgressBar, ProgressStyle};
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -85,8 +85,9 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_wizard_flow(args: &Cli) -> anyhow::Result<()> {
+    let existing = Config::load();
     let report = scan::scan();
-    let (config, should_execute) = prompt::run_wizard(&report)?;
+    let (config, should_execute) = prompt::run_wizard(&report, existing.as_ref())?;
 
     if should_execute {
         config.save()?;
@@ -97,6 +98,11 @@ async fn run_wizard_flow(args: &Cli) -> anyhow::Result<()> {
         let actions = prompt::get_filtered_actions(&config, &report);
         let actions = if args.greedy || config.brew.greedy {
             apply_brew_greedy(actions)
+        } else {
+            actions
+        };
+        let actions = if config.mise.yes {
+            apply_mise_yes(actions)
         } else {
             actions
         };
@@ -123,6 +129,7 @@ async fn run_without_config(args: &Cli) -> anyhow::Result<()> {
     } else {
         actions
     };
+    let actions = apply_mise_yes(actions);
 
     if actions.is_empty() {
         println!("No actions to run.");
@@ -189,6 +196,11 @@ async fn run_with_config(args: &Cli) -> anyhow::Result<()> {
     let actions = filter_actions(actions, args.only.as_deref(), args.skip.as_deref());
     let actions = if args.greedy || config.brew.greedy {
         apply_brew_greedy(actions)
+    } else {
+        actions
+    };
+    let actions = if config.mise.yes {
+        apply_mise_yes(actions)
     } else {
         actions
     };

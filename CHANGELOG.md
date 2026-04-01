@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--greedy` CLI flag to pass `--greedy` to `brew upgrade` commands, including auto-updating casks in the upgrade
 - Brew greedy mode can also be set as a default via `[brew]` section in config (`greedy = true`)
+- Configurable `--yes` flag for `mise self-update` via `[mise]` section in config (`yes = true` by default)
 - Corepack detection for pnpm: if corepack is available, uses `corepack install -g pnpm@latest` instead of `pnpm self-update`
+- Config wizard now prompts for brew `--greedy` and mise `--yes` options when those managers are selected
+
+### Fixed
+
+- `yup config` now loads existing saved config and pre-selects previously enabled managers instead of selecting all by default
 
 ### Changed
 
-- `mise self-update` now passes `--yes` to skip the confirmation prompt
+- `mise self-update` now passes `--yes` by default to skip the confirmation prompt (configurable via `[mise]` config section)
 
 ## [0.1.4] - 2026-01-12
 

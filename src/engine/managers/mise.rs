@@ -10,7 +10,7 @@ impl PackageManager for MiseManager {
         vec![
             Action::new(
                 Manager::Mise,
-                "mise self-update --yes",
+                "mise self-update",
                 "Update mise itself",
                 false,
             ),

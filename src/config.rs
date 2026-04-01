@@ -14,6 +14,24 @@ pub struct BrewConfig {
     pub greedy: bool,
 }
 
+/// Mise-specific configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MiseConfig {
+    /// Pass --yes to mise self-update (skip confirmation prompts)
+    #[serde(default = "default_true")]
+    pub yes: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+impl Default for MiseConfig {
+    fn default() -> Self {
+        Self { yes: true }
+    }
+}
+
 /// User configuration for yup
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Config {
@@ -22,6 +40,9 @@ pub struct Config {
     /// Homebrew-specific settings
     #[serde(default)]
     pub brew: BrewConfig,
+    /// Mise-specific settings
+    #[serde(default)]
+    pub mise: MiseConfig,
 }
 
 impl Config {
