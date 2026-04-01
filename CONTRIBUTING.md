@@ -37,15 +37,15 @@ For new package managers, include:
 ```bash
 git clone https://github.com/izantech/yup
 cd yup
-cargo build
-cargo run -- --help
+./dev build
+./dev run -- --help
 ```
 
 ### Testing
 
 ```bash
-cargo test
-cargo run -- --dry-run  # Preview actions without executing
+./dev test
+./dev run -- --dry-run  # Preview actions without executing
 ```
 
 ## Code Style
@@ -54,8 +54,7 @@ cargo run -- --dry-run  # Preview actions without executing
 
 Before committing:
 ```bash
-cargo fmt
-cargo clippy
+./dev check  # fmt --check + clippy + tests
 ```
 
 ### Conventions
@@ -78,48 +77,19 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for a step-by-step guide.
 
 ## Releasing
 
-We use [cargo-release](https://github.com/crate-ci/cargo-release) to automate version bumping, tagging, and pushing.
-
-### Setup (one-time)
-
-```bash
-cargo install cargo-release
-```
-
-### Creating a Release
-
-```bash
-# Patch release (0.1.0 → 0.1.1)
-cargo release patch --execute
-
-# Minor release (0.1.1 → 0.2.0)
-cargo release minor --execute
-
-# Major release (0.2.0 → 1.0.0)
-cargo release major --execute
-```
-
-This will:
-1. Bump the version in `Cargo.toml`
-2. Commit the change
-3. Create a git tag (e.g., `v0.1.1`)
-4. Push the commit and tag to GitHub
+1. Bump version in `Cargo.toml` and rename `[Unreleased]` in `CHANGELOG.md` to `[x.y.z] - date`
+2. Commit: `chore: release yup version x.y.z`
+3. Run `cargo build` to update `Cargo.lock`, commit: `chore: update Cargo.lock for vx.y.z`
+4. Push to main
+5. Create and push an annotated tag: `git tag -a vx.y.z -m "Release vx.y.z" && git push origin vx.y.z`
 
 The GitHub Actions workflow then automatically:
 - Builds binaries for all platforms (macOS, Linux, Windows x64/ARM64)
-- Creates a GitHub Release
+- Creates a GitHub Release with inline SHA256 checksums
 - Publishes to crates.io
 - Updates the Homebrew formula
 - Submits to winget (Windows Package Manager)
 - Publishes to Chocolatey
-
-### Preview (dry-run)
-
-To see what would happen without making changes:
-
-```bash
-cargo release patch
-```
 
 ## License
 

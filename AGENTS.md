@@ -28,11 +28,20 @@ cargo run -- --verbose   # Run with command output visible
 
 ## Release Process
 
-Uses `cargo-release` for version bumps:
-```bash
-cargo release patch --execute  # 0.1.0 → 0.1.1
-cargo release minor --execute  # 0.1.1 → 0.2.0
-```
+1. Bump version in `Cargo.toml` and update `CHANGELOG.md` (rename `[Unreleased]` to `[x.y.z] - date`)
+2. Commit: `chore: release yup version x.y.z`
+3. Update `Cargo.lock`: run `cargo build`, commit `chore: update Cargo.lock for vx.y.z`
+4. Push, create annotated tag: `git tag -a vx.y.z -m "Release vx.y.z"`, push tag
+5. CI handles: GitHub release, Homebrew tap, winget, chocolatey, crates.io
+
+Release title convention: `v0.1.5` (not `0.1.5 - date`)
+
+### Troubleshooting
+
+- **crates.io fails with dirty Cargo.lock**: Commit `Cargo.lock` after version bump (step 3)
+- **winget `CreateRef` permission error**: Sync the `izantech/winget-pkgs` fork with upstream:
+  `gh api repos/izantech/winget-pkgs/merge-upstream -f branch=master`
+- **chocolatey 504 timeout**: Transient — re-run failed job: `gh run rerun <id> --failed`
 
 ## Architecture
 

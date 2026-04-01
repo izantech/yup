@@ -157,19 +157,15 @@ Cross-platform managers (npm, cargo, asdf, etc.) have no `#[cfg]` attribute.
 
 ## Testing
 
-### Unit Tests
+Use the `./dev` script for common workflows:
 
 ```bash
-cargo test
-```
-
-### Manual Testing
-
-```bash
-cargo run -- --dry-run      # Preview actions without executing
-cargo run -- --status       # Check for outdated packages
-cargo run -- --verbose      # See command output
-cargo run -- --only brew    # Test specific manager
+./dev test                  # Run all tests
+./dev run -- --dry-run      # Preview actions without executing
+./dev run -- --status       # Check for outdated packages
+./dev run -- --verbose      # See command output
+./dev run -- --only brew    # Test specific manager
+./dev check                 # fmt --check + clippy + tests
 ```
 
 ## Build & Release
@@ -177,24 +173,18 @@ cargo run -- --only brew    # Test specific manager
 ### Local Build
 
 ```bash
-cargo build --release
+./dev build                 # Debug build
+./dev build --release       # Release build
 ```
 
 ### Release Process
 
-1. **Publish to crates.io:**
-```bash
-cargo publish --dry-run  # Verify first
-cargo publish
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md#releasing) for the full release workflow. In short:
 
-2. **Tag the release:**
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-3. **Update Homebrew formula** in `izantech/homebrew-tap` with the new version and SHA256.
+1. Bump version in `Cargo.toml` + update `CHANGELOG.md`
+2. Commit, update `Cargo.lock`, commit
+3. Push, create annotated tag, push tag
+4. CI builds binaries and publishes to crates.io, Homebrew, winget, and Chocolatey
 
 ## Key Dependencies
 

@@ -44,7 +44,7 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 
 | Manager | Commands |
 |---------|----------|
-| **mise** | `mise self-update --yes`<br>`mise plugins update`<br>`mise upgrade`<br>`mise outdated` |
+| **mise** | `mise self-update` (with `--yes` by default, configurable via `[mise]` config)<br>`mise plugins update`<br>`mise upgrade`<br>`mise outdated` |
 | **conda** | `conda update -n base conda -y`<br>`conda update -n base --all -y` |
 
 ### Language Package Managers
