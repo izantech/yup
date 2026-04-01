@@ -42,6 +42,7 @@ pub fn run_wizard(report: &ScanReport) -> anyhow::Result<(Config, bool)> {
     // Build config
     let config = Config {
         enabled_managers: enabled_managers.clone(),
+        ..Config::default()
     };
 
     // Preview commands

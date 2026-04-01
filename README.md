@@ -64,6 +64,7 @@ yup [OPTIONS] [COMMAND]
 | `--only <managers>` | Only update specified managers (comma-separated) |
 | `--skip <managers>` | Skip specified managers (comma-separated) |
 | `--status` | Check for outdated packages without updating |
+| `--greedy` | Pass `--greedy` to brew upgrade (include auto-updating casks) |
 
 ### Examples
 
@@ -92,6 +93,9 @@ yup --skip softwareupdate,mas
 # Check for outdated packages
 yup --status
 
+# Include auto-updating casks in brew upgrade
+yup --greedy
+
 # View last run log
 yup log
 ```
@@ -109,6 +113,17 @@ Configuration is stored at:
 - **Windows:** `%APPDATA%/yup/config.toml`
 
 Run `yup config` to reconfigure at any time.
+
+### Brew Greedy Mode
+
+Add a `[brew]` section to your config to always pass `--greedy` to brew upgrade commands:
+
+```toml
+[brew]
+greedy = true
+```
+
+This includes auto-updating casks in the upgrade. The `--greedy` CLI flag overrides this setting per-run.
 
 ## Supported Managers
 
@@ -134,7 +149,7 @@ Run `yup config` to reconfigure at any time.
 
 ### Language Package Managers
 - **npm** - Global Node.js packages
-- **pnpm** - Global Node.js packages
+- **pnpm** - Global Node.js packages (auto-detects corepack)
 - **pipx** - Python CLI applications (isolated environments)
 - **gem** - Ruby gems
 - **rustup** - Rust toolchains

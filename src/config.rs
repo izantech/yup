@@ -6,11 +6,22 @@ use serde::{Deserialize, Serialize};
 
 use crate::engine::Manager;
 
+/// Homebrew-specific configuration
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct BrewConfig {
+    /// Pass --greedy to brew upgrade (include auto-updating casks)
+    #[serde(default)]
+    pub greedy: bool,
+}
+
 /// User configuration for yup
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Config {
     /// Enabled managers (stored as lowercase strings)
     pub enabled_managers: Vec<Manager>,
+    /// Homebrew-specific settings
+    #[serde(default)]
+    pub brew: BrewConfig,
 }
 
 impl Config {

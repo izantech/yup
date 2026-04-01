@@ -27,7 +27,7 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 
 | Manager | Commands |
 |---------|----------|
-| **brew** | `brew update`<br>`brew upgrade`<br>`brew upgrade --cask`<br>`brew outdated`<br>`brew outdated --cask` |
+| **brew** | `brew update`<br>`brew upgrade`<br>`brew upgrade --cask`<br>`brew outdated`<br>`brew outdated --cask`<br>With `--greedy`: appends `--greedy` to upgrade commands |
 | **apt** | `apt update`<br>`apt upgrade -y`<br>`apt autoremove -y` |
 | **dnf** | `dnf upgrade -y`<br>`dnf autoremove -y` |
 | **pacman** | `pacman -Syu --noconfirm` |
@@ -44,7 +44,7 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 
 | Manager | Commands |
 |---------|----------|
-| **mise** | `mise self-update`<br>`mise plugins update`<br>`mise upgrade`<br>`mise outdated` |
+| **mise** | `mise self-update --yes`<br>`mise plugins update`<br>`mise upgrade`<br>`mise outdated` |
 | **conda** | `conda update -n base conda -y`<br>`conda update -n base --all -y` |
 
 ### Language Package Managers
@@ -52,7 +52,7 @@ When privileged commands are queued, `yup` prompts for your password once via `s
 | Manager | Commands |
 |---------|----------|
 | **npm** | `npm update -g`<br>`npm outdated -g` |
-| **pnpm** | `pnpm self-update`<br>`pnpm update -g`<br>`pnpm outdated -g` |
+| **pnpm** | `pnpm self-update` (or `corepack install -g pnpm@latest` if corepack is available)<br>`pnpm update -g`<br>`pnpm outdated -g` |
 | **pipx** | `pipx upgrade-all` |
 | **gem** | `gem update --system`<br>`gem update`<br>`gem outdated` |
 | **rustup** | `rustup update`<br>`rustup check` |

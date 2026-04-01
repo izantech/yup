@@ -115,3 +115,19 @@ declare_managers! {
     #[cfg(target_os = "windows")]
     Winget => winget::WingetManager,
 }
+
+/// Append `--greedy` to any `brew upgrade` action that doesn't already have it.
+pub fn apply_brew_greedy(actions: Vec<Action>) -> Vec<Action> {
+    actions
+        .into_iter()
+        .map(|mut a| {
+            if a.manager == Manager::Brew
+                && a.command.starts_with("brew upgrade")
+                && !a.command.contains("--greedy")
+            {
+                a.command.push_str(" --greedy");
+            }
+            a
+        })
+        .collect()
+}

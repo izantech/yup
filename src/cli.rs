@@ -34,6 +34,10 @@ pub struct Cli {
     /// Show command output during execution
     #[arg(short = 'v', long = "verbose", global = true)]
     pub verbose: bool,
+
+    /// Pass --greedy to brew upgrade (include auto-updating casks)
+    #[arg(long, global = true)]
+    pub greedy: bool,
 }
 
 #[derive(Subcommand, Debug)]
