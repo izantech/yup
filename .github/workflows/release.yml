@@ -276,6 +276,14 @@ jobs:
           # Write and read notes from a file to avoid quoting breaking things
           echo "$ANNOUNCEMENT_BODY" > $RUNNER_TEMP/notes.txt
 
+          # Replace [checksum](url) links with actual SHA256 hashes
+          for sha_file in artifacts/*.sha256; do
+            [ -f "$sha_file" ] || continue
+            hash=$(cut -d ' ' -f1 < "$sha_file")
+            url_basename=$(basename "$sha_file")
+            sed -i "s|\[checksum\](.*${url_basename})|${hash}|g" $RUNNER_TEMP/notes.txt
+          done
+
           gh release create "${{ needs.plan.outputs.tag }}" --target "$RELEASE_COMMIT" $PRERELEASE_FLAG --title "$ANNOUNCEMENT_TITLE" --notes-file "$RUNNER_TEMP/notes.txt" artifacts/*
 
   announce:
