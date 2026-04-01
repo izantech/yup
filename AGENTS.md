@@ -4,16 +4,26 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Build & Test Commands
 
+Use the `./dev` script for common workflows:
+
 ```bash
-cargo build              # Debug build
-cargo build --release    # Release build
-cargo test               # Run all tests
+./dev build              # Debug build
+./dev build --release    # Release build
+./dev test               # Run all tests
+./dev run -- --dry-run   # Preview actions without executing
+./dev run -- --only brew # Test specific manager
+./dev check              # fmt --check + clippy + tests
+./dev fmt                # Format code
+./dev clippy             # Lint
+./dev clean              # Clean build artifacts
+./dev                    # Default: check + build
+```
+
+Or use cargo directly:
+
+```bash
 cargo test <test_name>   # Run a specific test
-cargo fmt                # Format code
-cargo clippy             # Lint
-cargo run -- --dry-run   # Preview actions without executing
 cargo run -- --verbose   # Run with command output visible
-cargo run -- --only brew # Test specific manager
 ```
 
 ## Release Process

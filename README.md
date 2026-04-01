@@ -207,6 +207,19 @@ When privileged commands are queued, `yup` will:
 
 This means you only enter your password once, not for each command.
 
+## Development
+
+A `./dev` script is provided for common workflows:
+
+```bash
+./dev build              # Debug build (--release for release)
+./dev test               # Run all tests
+./dev run -- --dry-run   # Build and run with args
+./dev check              # fmt + clippy + tests
+./dev fmt                # Format code
+./dev                    # Default: check + build
+```
+
 ## Requirements
 
 - macOS, Linux, or Windows

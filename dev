@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
+
+CONFIGURATION="debug"
+
+log() {
+  printf '[dev] %s\n' "$*"
+}
+
+die() {
+  printf '[dev] ERROR: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: ./dev <command> [--release]
+
+Commands:
+  build      Build the project
+  test       Run all tests
+  run        Build and run (passes extra args to yup)
+  check      Run fmt --check, clippy, and tests
+  fmt        Format code
+  clippy     Run clippy lints
+  clean      Clean build artifacts
+  all        check + build (default)
+  help       Show this help
+
+Examples:
+  ./dev build --release
+  ./dev run -- --dry-run
+  ./dev run -- --only brew --greedy
+  ./dev check
+USAGE
+}
+
+cmd_build() {
+  if [[ "$CONFIGURATION" == "release" ]]; then
+    log "Building (release)..."
+    cargo build --release
+  else
+    log "Building (debug)..."
+    cargo build
+  fi
+}
+
+cmd_test() {
+  log "Running tests..."
+  cargo test
+}
+
+cmd_run() {
+  if [[ "$CONFIGURATION" == "release" ]]; then
+    log "Running (release)..."
+    cargo run --release -- "$@"
+  else
+    log "Running (debug)..."
+    cargo run -- "$@"
+  fi
+}
+
+cmd_check() {
+  log "Checking formatting..."
+  cargo fmt --check
+
+  log "Running clippy..."
+  cargo clippy -- -D warnings
+
+  log "Running tests..."
+  cargo test
+
+  log "All checks passed."
+}
+
+cmd_fmt() {
+  log "Formatting code..."
+  cargo fmt
+}
+
+cmd_clippy() {
+  log "Running clippy..."
+  cargo clippy -- -D warnings
+}
+
+cmd_clean() {
+  log "Cleaning build artifacts..."
+  cargo clean
+}
+
+main() {
+  local cmd="${1:-all}"
+  if [[ $# -gt 0 ]]; then
+    shift
+  fi
+
+  # Separate flags from passthrough args (after --)
+  local passthrough=()
+  local parsing_flags=true
+  local remaining=("$@")
+
+  for ((i=0; i<${#remaining[@]}; i++)); do
+    if [[ "$parsing_flags" == "true" ]]; then
+      case "${remaining[i]}" in
+        --release)
+          CONFIGURATION="release"
+          ;;
+        --debug)
+          CONFIGURATION="debug"
+          ;;
+        --)
+          parsing_flags=false
+          ;;
+        -h|--help)
+          usage
+          exit 0
+          ;;
+        *)
+          passthrough+=("${remaining[i]}")
+          ;;
+      esac
+    else
+      passthrough+=("${remaining[i]}")
+    fi
+  done
+
+  case "$cmd" in
+    build)    cmd_build ;;
+    test)     cmd_test ;;
+    run)      cmd_run "${passthrough[@]+"${passthrough[@]}"}" ;;
+    check)    cmd_check ;;
+    fmt)      cmd_fmt ;;
+    clippy)   cmd_clippy ;;
+    clean)    cmd_clean ;;
+    all)      cmd_check && cmd_build ;;
+    -h|--help|help) usage ;;
+    *)
+      usage
+      die "Unknown command: $cmd"
+      ;;
+  esac
+}
+
+main "$@"
